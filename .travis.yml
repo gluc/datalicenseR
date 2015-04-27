@@ -1,0 +1,14 @@
+language: r
+
+sudo: required
+
+warnings_are_errors: true
+
+r_build_args: 
+r_check_args: --as-cran
+
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
