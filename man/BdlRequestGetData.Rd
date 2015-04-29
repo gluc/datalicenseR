@@ -4,7 +4,7 @@
 \alias{BdlRequestGetData}
 \title{Create a GetData request}
 \usage{
-BdlRequestGetData()
+BdlRequestGetData(firmName, fields, instruments, header = c())
 }
 \value{
 a BdlRequest object

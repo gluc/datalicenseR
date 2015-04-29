@@ -9,7 +9,7 @@ VignetteBuilder: knitr
 Imports:
     RCurl
 Suggests:
-    testthat, knitr
+    testthat, knitr, stringr
 Description: Download prices, market data, and master data with the 
     Bloomberg Datalicense service. As a prerequisite, you need a valid
     license from Bloomberg. This software and its author are in no way 
