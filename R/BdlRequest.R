@@ -22,6 +22,12 @@ BdlRequest <- function(
     header = c()
   ) {
   
+  if (!inherits(firmName,"character")) stop("firmName must be of class character")
+  if (!inherits(programName,"character")) stop("programName must be of class character")
+  if (!inherits(fields,"character")) stop("fields must be of class character")
+  if (!inherits(instruments,"character")) stop("instruments must be of class character")
+  
+  
   bdlRequest <- list()
   bdlRequest$header <- c(FIRMNAME = firmName, header, PROGRAMNAME = programName)
   bdlRequest$fields <- fields
@@ -34,21 +40,24 @@ BdlRequest <- function(
 
 #' Convert a BdlRequest instance to a character string
 #' 
+#' @param x A BdlRequest
+#' @param ... Any additional parameters
+#' 
 #' @export
-print.BdlRequest <- function(bdlRequest, ...) {
-  if (!inherits(bdlRequest,"BdlRequest")) stop("bdlRequest must be of class BdlRequest")
+print.BdlRequest <- function(x, ...) {
+  if (!inherits(x,"BdlRequest")) stop("x must be of class BdlRequest")
   res <- 'START-OF-FILE'
   
   #header
-  for (key in names(bdlRequest$header)) {
-    res <- paste0(res, '\n\r', key, '=', bdlRequest$header[key])
+  for (key in names(x$header)) {
+    res <- paste0(res, '\n\r', key, '=', x$header[key])
   }
   
   res <- paste0(res, '\n\r')
   
   #fields
   res <- paste0(res, '\n\r', 'START-OF-FIELDS')
-  for (field in bdlRequest$fields) {
+  for (field in x$fields) {
     res <- paste0(res, '\n\r', field)
   }
   res <- paste0(res, '\n\r', 'END-OF-FIELDS')
@@ -59,7 +68,7 @@ print.BdlRequest <- function(bdlRequest, ...) {
   #instruments / data
   res <- paste0(res, '\n\r', 'START-OF-DATA')
   
-  for (instrument in bdlRequest$instruments) {
+  for (instrument in x$instruments) {
     res <- paste0(res, '\n\r', instrument)
   }  
   res <- paste0(res, '\n\r', 'END-OF-DATA')

@@ -13,6 +13,9 @@ UploadRequest(bdlRequest, bdlConnection, targetFileName)
 
 \item{targetFileName}{The name the file should have at the Bloomberg FTP site}
 }
+\value{
+BdlResponse
+}
 \description{
 Uploads a BdlRequest to Bloomberg
 }
@@ -20,5 +23,7 @@ Uploads a BdlRequest to Bloomberg
 BdlConnection
 
 BdlRequest
+
+BdlResponse
 }
 

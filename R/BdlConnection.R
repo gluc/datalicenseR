@@ -45,19 +45,30 @@ BdlConnection <- function(user,
 #' @param bdlRequest A BdlRequest object
 #' @param bdlConnection A BdlConnection object
 #' @param targetFileName The name the file should have at the Bloomberg FTP site 
+#' @return BdlResponse
 #' 
 #' @seealso BdlConnection
 #' @seealso BdlRequest
+#' @seealso BdlResponse
 #' 
 #' @export
 UploadRequest <- function(bdlRequest, bdlConnection, targetFileName) {
+  if (!inherits(bdlRequest,"BdlRequest")) stop("bdlRequest must be of class BdlRequest")
+  if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
+  if (!inherits(targetFileName,"character")) stop("targetFileName must be of class character")
+  
   request <- BdlRequest$GetBdlRequest()
   UploadFTP(request, bdlConnection$connectionString, targetFileName)
+  response <- BdlResponse(bdlRequest, bdlConnection, targetFileName)
+  return (response)
 }
 
 
 
+
+
 DownloadFTP <- function(ftpConnection, file, delete = FALSE) {
+
   #see here for libcurl options: http://stackoverflow.com/questions/17119449/rcurl-boolean-options
   #resp http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
   url <- paste(ftpConnection, file, sep = '/')

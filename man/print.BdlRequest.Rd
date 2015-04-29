@@ -4,7 +4,12 @@
 \alias{print.BdlRequest}
 \title{Convert a BdlRequest instance to a character string}
 \usage{
-\method{print}{BdlRequest}(bdlRequest, ...)
+\method{print}{BdlRequest}(x, ...)
+}
+\arguments{
+\item{x}{A BdlRequest}
+
+\item{...}{Any additional parameters}
 }
 \description{
 Convert a BdlRequest instance to a character string
