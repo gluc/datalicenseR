@@ -1,21 +1,32 @@
 
 
-#' Create a GetData request
-#' 
+#' Create a Datalicense request
+#'
+#' @param firmName The firm name assigned to you by Bloomberg
+#' @param programName The name of the Datalicense program. Namely: 
+#' getdata, gethistory, getquotes, getallquotes, getactions, getcompany, getsnap
+#' @param fields A vector containing the fields to be downloaded, 
+#' e.g. fields = c('PX_LAST', 'PX_CLOSE')
+#' @param instruments A vector containing th instruments to be downloaded, 
+#' e.g. instruments = c('IBM US Equity')
+#' @param header A vector containing additional header fields, 
+#' e.g. header = c(PROGRAMFLAG = 'oneshot', SECMASTER = 'yes')
+#'   
 #' @return a BdlRequest object
 #' @export
-BdlRequestGetData <- function(
+BdlRequest <- function(
     firmName,
+    programName,
     fields,
     instruments,
     header = c()
   ) {
   
   bdlRequest <- list()
-  bdlRequest$header <- c(FIRMNAME = firmName, header, PROGRAMNAME = 'getdata')
+  bdlRequest$header <- c(FIRMNAME = firmName, header, PROGRAMNAME = programName)
   bdlRequest$fields <- fields
   bdlRequest$instruments <- instruments
-  class(bdlRequest) <- append(class(bdlRequest), c("BdlRequest", "BdlRequestGetData"))
+  class(bdlRequest) <- append(class(bdlRequest), c("BdlRequest"))
   
   return (bdlRequest)
 }
@@ -55,21 +66,9 @@ print.BdlRequest <- function(bdlRequest, ...) {
   
   res <- paste0(res, '\n\r')
     
-  res <- paste0(res, '\n\r', NextMethod("print",bdlRequest))
   res <- paste0(res, '\n\r', 'END-OF-FILE')
   return (res)
 }
-
-#' Convert a BdlRequestGetData instance to a character string
-#' 
-#' @export
-print.BdlRequestGetData <- function(bdlRequest, ...) {
-  if (!inherits(bdlRequest,"BdlRequestGetData")) stop("bdlRequest must be of class BdlRequestGetData")
-  # add GetData specific stuff, if required
-  return ('')
-  
-}
-
 
 
 UploadFTP <- function(content, ftpConnection, targetFileName) {

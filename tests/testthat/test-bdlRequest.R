@@ -2,9 +2,10 @@ context("bdl request")
 
 test_that("BdlRequest Sections", {
 
-  req <- BdlRequestGetData(firmName = 'dl1234', 
-                          fields = c('PX_LAST', 'PX_CLOSE'), 
-                          instruments = c('IBM US Equity'))
+  req <- BdlRequest(firmName = 'dl1234',
+                           programName = 'getdata',
+                           fields = c('PX_LAST', 'PX_CLOSE'), 
+                           instruments = c('IBM US Equity'))
   
   reqs <- print(req)
   cat(reqs)
@@ -27,10 +28,11 @@ test_that("BdlRequest Custom Fields", {
   header <- c(PROGRAMFLAG = 'oneshot',
               SECMASTER = 'yes')
   
-  req <- BdlRequestGetData(firmName = 'dl1234', 
-                          fields = c('PX_LAST', 'PX_CLOSE'), 
-                          instruments = c('IBM US Equity'),
-                          header = header)
+  req <- BdlRequest(firmName = 'dl1234', 
+                           programName = 'getdata',
+                           fields = c('PX_LAST', 'PX_CLOSE'), 
+                           instruments = c('IBM US Equity'),
+                           header = header)
   
   reqs <- print(req)
   cat(reqs)
