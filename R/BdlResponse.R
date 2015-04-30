@@ -57,7 +57,7 @@ GetBdlData <- function(bdlResponse) {
 
 #' Convert file content to data.frame
 #' 
-#' @param a string
+#' @param content The content string
 #' @return a data.frame
 ParseBdlResponseFile <- function(content) {
   #convert to data.frame

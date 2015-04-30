@@ -7,7 +7,7 @@
 ParseBdlResponseFile(content)
 }
 \arguments{
-\item{a}{string}
+\item{content}{The content string}
 }
 \value{
 a data.frame
