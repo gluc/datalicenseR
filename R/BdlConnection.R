@@ -75,16 +75,16 @@ UploadFTP <- function(content, ftpConnection, targetFileName) {
 FTPErrorHandler <- function() {
   
   me <- environment()
-  me$handleError <- function(code, msg) {
-    me$errorMsg <- msg
-    me$errorCode <- code
+  me$handleError <- function(e) {
+    me$errorMsg <- e$message
+    me$errorCode <- class(e)[1]
   }
   class(me) <- append(class(me), "FTPErrorHandler")
   return (me)
 }
 
 
-#' stores the result string and the download status
+#' stores the result string and the download success
 #' 
 #' @param content The content of the Downloaded file
 #' @param success TRUE if OK
@@ -97,7 +97,7 @@ FTPDownloadResult <- function(content, success, errorMsg, errorCode) {
   me$content <- content
   me$success <- success
   me$errorMsg <- errorMsg
-  me$errorCode <- code
+  me$errorCode <- errorCode
   class(me) <- append(class(me), "FTPDownloadResult")
   return (me)
 }
@@ -126,10 +126,11 @@ DownloadFTP <- function(baseURL, filePath, delete = FALSE) {
                             curl = getCurlHandle(), 
                             postquote = postquote, 
                             writefunction = h$update),
-                COULDNT_RESOLVE_HOST = function(x) e$handleError('COULDNT_RESOLVE_HOST', x$message),
-                REMOTE_FILE_NOT_FOUND = function(x) e$handleError('REMOTE_FILE_NOT_FOUND', x$message),
-                error = function(x) cat(class(x), "got it\n"))
+               #COULDNT_RESOLVE_HOST = function(x) e$handleError('COULDNT_RESOLVE_HOST', x$message)
+               REMOTE_FILE_NOT_FOUND = e$handleError
+               # error = function(x) e$handleError(x)  )
+              )
   
-  res <- FTPDownloadResult(h$value(), is.null(e$error), e$errorMsg, e$errorCode)
+  res <- FTPDownloadResult(h$value(), is.null(e$errorCode), e$errorMsg, e$errorCode)
   return (res)
 }

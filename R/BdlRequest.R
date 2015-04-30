@@ -50,32 +50,32 @@ print.BdlRequest <- function(x, ...) {
   
   #header
   for (key in names(x$header)) {
-    res <- paste0(res, '\n\r', key, '=', x$header[key])
+    res <- paste0(res, '\n', key, '=', x$header[key])
   }
   
-  res <- paste0(res, '\n\r')
+  res <- paste0(res, '\n')
   
   #fields
-  res <- paste0(res, '\n\r', 'START-OF-FIELDS')
+  res <- paste0(res, '\n', 'START-OF-FIELDS')
   for (field in x$fields) {
-    res <- paste0(res, '\n\r', field)
+    res <- paste0(res, '\n', field)
   }
-  res <- paste0(res, '\n\r', 'END-OF-FIELDS')
+  res <- paste0(res, '\n', 'END-OF-FIELDS')
   
 
-  res <- paste0(res, '\n\r')
+  res <- paste0(res, '\n')
     
   #instruments / data
-  res <- paste0(res, '\n\r', 'START-OF-DATA')
+  res <- paste0(res, '\n', 'START-OF-DATA')
   
   for (instrument in x$instruments) {
-    res <- paste0(res, '\n\r', instrument)
+    res <- paste0(res, '\n', instrument)
   }  
-  res <- paste0(res, '\n\r', 'END-OF-DATA')
+  res <- paste0(res, '\n', 'END-OF-DATA')
   
-  res <- paste0(res, '\n\r')
+  res <- paste0(res, '\n')
     
-  res <- paste0(res, '\n\r', 'END-OF-FILE')
+  res <- paste0(res, '\n', 'END-OF-FILE')
   return (res)
 }
 

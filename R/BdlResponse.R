@@ -19,9 +19,9 @@ BdlResponse <- function(bdlRequest, bdlConnection, targetFileName) {
   bdlResponse$bdlRequest <- bdlRequest
   bdlResponse$bdlConnection <- bdlConnection
   bdlResponse$targetFileName <- targetFileName
-  class(bdlRequest) <- append(class(bdlRequest), c("BdlResponse"))
+  class(bdlResponse) <- append(class(bdlResponse), c("BdlResponse"))
   
-  return (bdlRequest)
+  return (bdlResponse)
 }
 
 
@@ -35,10 +35,18 @@ BdlResponse <- function(bdlRequest, bdlConnection, targetFileName) {
 #' @export
 GetBdlData <- function(bdlResponse) {
   if (!inherits(bdlResponse,"BdlResponse")) stop("bdlResponse must be of class BdlResponse")
-  ftpDownloadResult <- DownloadFTP(bdlResponse$bdlConnection$connectionString , bdlResponse$targetFileName, delete = FALSE)
+  
+  if ("REPLYFILENAME" %in% names(bdlResponse$bdlRequest$header)) {
+    replyFileName <- bdlResponse$bdlRequest$header$REPLYFILENAME
+  } else {
+    file <- substr(bdlResponse$targetFileName, 1, nchar(bdlResponse$targetFileName)-4)
+    replyFileName <- paste0(file, '.out')
+  }
+  
+  ftpDownloadResult <- DownloadFTP(bdlResponse$bdlConnection$connectionString , replyFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
     res <- ParseBdlResponseFile(res)
-    return (ftpDownloadResult$content)
+    return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
     return (NULL)
   } else {
@@ -58,7 +66,3 @@ ParseBdlResponseFile <- function(content) {
 
 
   
-  FTPDownloadResult <- function(content, success, msg) {
-    
-    
-}

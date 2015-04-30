@@ -2,9 +2,9 @@
 % Please edit documentation in R/BdlConnection.R
 \name{FTPDownloadResult}
 \alias{FTPDownloadResult}
-\title{stores the result string and the download status}
+\title{stores the result string and the download success}
 \usage{
-FTPDownloadResult(content, success, msg)
+FTPDownloadResult(content, success, errorMsg, errorCode)
 }
 \arguments{
 \item{content}{The content of the Downloaded file}
@@ -16,7 +16,7 @@ FTPDownloadResult(content, success, msg)
 \item{errorCode}{The error code, if applicable}
 }
 \description{
-stores the result string and the download status
+stores the result string and the download success
 }
 \seealso{
 DownloadFTP
