@@ -4,14 +4,14 @@
 \alias{UploadRequest}
 \title{Uploads a BdlRequest to Bloomberg}
 \usage{
-UploadRequest(bdlRequest, bdlConnection, targetFileName)
+UploadRequest(bdlRequest, bdlConnection, targetFilePath)
 }
 \arguments{
 \item{bdlRequest}{A BdlRequest object}
 
 \item{bdlConnection}{A BdlConnection object}
 
-\item{targetFileName}{The name the file should have at the Bloomberg FTP site}
+\item{targetFilePath}{The name the file should have at the Bloomberg FTP site}
 }
 \value{
 BdlResponse

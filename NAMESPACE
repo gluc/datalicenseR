@@ -3,5 +3,6 @@
 S3method(print,BdlRequest)
 export(BdlConnection)
 export(BdlRequest)
+export(GetBdlData)
 export(UploadRequest)
 import(RCurl)

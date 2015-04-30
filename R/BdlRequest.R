@@ -79,8 +79,3 @@ print.BdlRequest <- function(x, ...) {
   return (res)
 }
 
-
-UploadFTP <- function(content, ftpConnection, targetFileName) {
-  url <- paste(ftpConnection, targetFileName, sep = '/')
-  ftpUpload(I(content), url)
-}

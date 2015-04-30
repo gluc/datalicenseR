@@ -2,7 +2,7 @@
 % Please edit documentation in R/BdlResponse.R
 \name{BdlResponse}
 \alias{BdlResponse}
-\title{Handle to let you retrieve a data file from Bloomberg}
+\title{Handle that lets you retrieve a data file from Bloomberg}
 \usage{
 BdlResponse(bdlRequest, bdlConnection, targetFileName)
 }

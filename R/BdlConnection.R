@@ -44,7 +44,7 @@ BdlConnection <- function(user,
 #' 
 #' @param bdlRequest A BdlRequest object
 #' @param bdlConnection A BdlConnection object
-#' @param targetFileName The name the file should have at the Bloomberg FTP site 
+#' @param targetFilePath The name the file should have at the Bloomberg FTP site 
 #' @return BdlResponse
 #' 
 #' @seealso BdlConnection
@@ -52,30 +52,84 @@ BdlConnection <- function(user,
 #' @seealso BdlResponse
 #' 
 #' @export
-UploadRequest <- function(bdlRequest, bdlConnection, targetFileName) {
+UploadRequest <- function(bdlRequest, bdlConnection, targetFilePath) {
   if (!inherits(bdlRequest,"BdlRequest")) stop("bdlRequest must be of class BdlRequest")
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
-  if (!inherits(targetFileName,"character")) stop("targetFileName must be of class character")
+  if (!inherits(targetFilePath,"character")) stop("targetFilePath must be of class character")
   
-  request <- BdlRequest$GetBdlRequest()
-  UploadFTP(request, bdlConnection$connectionString, targetFileName)
-  response <- BdlResponse(bdlRequest, bdlConnection, targetFileName)
+  request <- print(bdlRequest)
+  UploadFTP(request, bdlConnection$connectionString, targetFilePath)
+  response <- BdlResponse(bdlRequest, bdlConnection, targetFilePath)
   return (response)
 }
 
 
 
 
+UploadFTP <- function(content, ftpConnection, targetFileName) {
+  url <- paste(ftpConnection, targetFileName, sep = '/')
+  ftpUpload(I(content), url)
+}
 
-DownloadFTP <- function(ftpConnection, file, delete = FALSE) {
+
+FTPErrorHandler <- function() {
+  
+  me <- environment()
+  me$handleError <- function(code, msg) {
+    me$errorMsg <- msg
+    me$errorCode <- code
+  }
+  class(me) <- append(class(me), "FTPErrorHandler")
+  return (me)
+}
+
+
+#' stores the result string and the download status
+#' 
+#' @param content The content of the Downloaded file
+#' @param success TRUE if OK
+#' @param errorMsg The error message, if !success
+#' @param errorCode The error code, if applicable
+#' 
+#' @seealso DownloadFTP  
+FTPDownloadResult <- function(content, success, errorMsg, errorCode) {
+  me <- list()
+  me$content <- content
+  me$success <- success
+  me$errorMsg <- errorMsg
+  me$errorCode <- code
+  class(me) <- append(class(me), "FTPDownloadResult")
+  return (me)
+}
+
+
+#' Downloads a file via FTP. 
+#' 
+#' @param baseURL The base URL
+#' @param filePath The path to the file, relative from the baseURL
+#' @param delete Whether or not to delete the file after successful downloading
+#' 
+#' @return An FTPDownloadResult
+#' @seealso FTPDownloadResult
+DownloadFTP <- function(baseURL, filePath, delete = FALSE) {
 
   #see here for libcurl options: http://stackoverflow.com/questions/17119449/rcurl-boolean-options
   #resp http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
-  url <- paste(ftpConnection, file, sep = '/')
-  h = basicTextGatherer()
-  if (delete) postquote <- c(paste0("DELE ", '/', file))
+  url <- paste(baseURL, filePath, sep = '/')
+  h <- basicTextGatherer()
+  e <- FTPErrorHandler() 
+  if (delete) postquote <- c(paste0("DELE ", '/', filePath))
   else postquote <- c()
-  x <- curlPerform(url = url, upload = FALSE, curl = getCurlHandle(), 
-                   postquote = postquote, writefunction = h$update)
-  h$value()
+  
+  x <- tryCatch(curlPerform(url = url, 
+                            upload = FALSE, 
+                            curl = getCurlHandle(), 
+                            postquote = postquote, 
+                            writefunction = h$update),
+                COULDNT_RESOLVE_HOST = function(x) e$handleError('COULDNT_RESOLVE_HOST', x$message),
+                REMOTE_FILE_NOT_FOUND = function(x) e$handleError('REMOTE_FILE_NOT_FOUND', x$message),
+                error = function(x) cat(class(x), "got it\n"))
+  
+  res <- FTPDownloadResult(h$value(), is.null(e$error), e$errorMsg, e$errorCode)
+  return (res)
 }
