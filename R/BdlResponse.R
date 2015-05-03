@@ -45,7 +45,7 @@ GetBdlData <- function(bdlResponse) {
   
   ftpDownloadResult <- DownloadFTP(bdlResponse$bdlConnection$connectionString , replyFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
-    res <- ParseBdlResponseFile(res)
+    res <- ParseBdlResponseFile(ftpDownloadResult$content)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
     return (NULL)
