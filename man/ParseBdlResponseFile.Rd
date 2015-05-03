@@ -2,17 +2,17 @@
 % Please edit documentation in R/BdlResponse.R
 \name{ParseBdlResponseFile}
 \alias{ParseBdlResponseFile}
-\title{Convert file content to data.frame}
+\title{Convert Bloomberg out file content to data.frame}
 \usage{
-ParseBdlResponseFile(content)
+ParseBdlResponseFile(bdlOutContent)
 }
 \arguments{
-\item{content}{The content string}
+\item{bdlOutContent}{The content string}
 }
 \value{
 a data.frame
 }
 \description{
-Convert file content to data.frame
+Convert Bloomberg out file content to data.frame
 }
 
