@@ -1,51 +1,47 @@
 
 
-#' Create a Datalicense request
+#' Helper to create a Datalicense request
+#' 
+#' Please refer to the Bloomberg Per Security Enterprise Solution manual for details.
 #'
-#' @param firmName The firm name assigned to you by Bloomberg
-#' @param programName The name of the Datalicense program. Namely: 
-#' getdata, gethistory, getquotes, getallquotes, getactions, getcompany, getsnap
+#' @param header A vector containing additional header fields, 
+#' e.g. header = c(FIRMNAME = 'dl1234', PROGRAMNAME = 'getdata', PROGRAMFLAG = 'oneshot', SECMASTER = 'yes')
 #' @param fields A vector containing the fields to be downloaded, 
 #' e.g. fields = c('PX_LAST', 'PX_CLOSE')
-#' @param instruments A vector containing th instruments to be downloaded, 
-#' e.g. instruments = c('IBM US Equity')
-#' @param header A vector containing additional header fields, 
-#' e.g. header = c(PROGRAMFLAG = 'oneshot', SECMASTER = 'yes')
+#' @param data A vector containing the instruments to be downloaded, 
+#' e.g. data = c('IBM US Equity')
 #'   
-#' @return a BdlRequest object
+#' @return a BdlRequestBuilder object
 #' @export
-BdlRequest <- function(
-    firmName,
-    programName,
+BdlRequestBuilder <- function(
+    header,
     fields,
-    instruments,
-    header = c()
+    data
   ) {
   
-  if (!inherits(firmName,"character")) stop("firmName must be of class character")
-  if (!inherits(programName,"character")) stop("programName must be of class character")
+  if (!inherits(header,"character")) stop("header must be of class character")
   if (!inherits(fields,"character")) stop("fields must be of class character")
-  if (!inherits(instruments,"character")) stop("instruments must be of class character")
+  if (!inherits(data,"character")) stop("data must be of class character")
   
   
   bdlRequest <- list()
-  bdlRequest$header <- c(FIRMNAME = firmName, header, PROGRAMNAME = programName)
+  bdlRequest$header <- header
   bdlRequest$fields <- fields
-  bdlRequest$instruments <- instruments
-  class(bdlRequest) <- append(class(bdlRequest), c("BdlRequest"))
+  bdlRequest$data <- data
+  class(bdlRequest) <- append(class(bdlRequest), c("BdlRequestBuilder"))
   
   return (bdlRequest)
 }
 
 
-#' Convert a BdlRequest instance to a character string
+#' Convert a BdlRequestBuilder instance to a character string
 #' 
-#' @param x A BdlRequest
+#' @param x A BdlRequestBuilder object
 #' @param ... Any additional parameters
 #' 
 #' @export
-print.BdlRequest <- function(x, ...) {
-  if (!inherits(x,"BdlRequest")) stop("x must be of class BdlRequest")
+as.character.BdlRequestBuilder <- function(x, ...) {
+  if (!inherits(x,"BdlRequestBuilder")) stop("x must be of class BdlRequestBuilder")
   res <- 'START-OF-FILE'
   
   #header
@@ -68,7 +64,7 @@ print.BdlRequest <- function(x, ...) {
   #instruments / data
   res <- paste0(res, '\n', 'START-OF-DATA')
   
-  for (instrument in x$instruments) {
+  for (instrument in x$data) {
     res <- paste0(res, '\n', instrument)
   }  
   res <- paste0(res, '\n', 'END-OF-DATA')

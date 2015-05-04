@@ -1,51 +1,57 @@
-#' Handle that lets you retrieve a data file from Bloomberg
+library(stringr)
+
+#' Derives the expected response file name
+#'  
 #' 
-#' Typically, this is not called directly, but returned when you call the 
+#' @param bdlRequest A BdlRequestBuilder object, or a character string 
+#' or a character string containing the request content, optional
+#' @param requestFileName The target file name of the request at the Bloomberg FTP site, optional
+#' @param responseFileName The name of the response file. If omitted, the method deducts 
+#' the response file name either from the BdlRequestBuilder, or from the requestFileName
+#' @return a character string, representing the responseFileName derived from the arguments provided
 #' 
-#' @param bdlRequest The request
-#' @param bdlConnection The connection
-#' @param targetFileName The name of the file at Bloomberg
+#' @seealso BdlRequestBuilder
 #' 
-#' @seealso UploadRequest
-#' @seealso BdlRequest
-#' 
-BdlResponse <- function(bdlRequest, bdlConnection, targetFileName) {
+DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, responseFileName = NULL) {
+  if (!(is.null(bdlRequest) || inherits(bdlRequest,"BdlRequestBuilder") || inherits(bdlRequest, "character"))) stop("bdlRequest must be of class BdlRequestBuilder or character")
+  if (!(is.null(requestFileName) || inherits(requestFileName,"character"))) stop("requestFileName must be of class character")
+  if (!(is.null(responseFileName) || inherits(responseFileName,"character"))) stop("responseFileName must be of class character")
+  if (((is.null(bdlRequest) || inherits(bdlRequest, "character")) && is.null(requestFileName) && is.null(responseFileName))) stop("either bdlRequest as BdlRequestBuilder, requestFileName, or responseFileName must be provided")
   
-  if (!inherits(bdlRequest,"BdlRequest")) stop("bdlRequest must be of class BdlRequest")
-  if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
-  if (!inherits(targetFileName,"character")) stop("targetFileName must be of class character")
   
-  bdlResponse <- list()
-  bdlResponse$bdlRequest <- bdlRequest
-  bdlResponse$bdlConnection <- bdlConnection
-  bdlResponse$targetFileName <- targetFileName
-  class(bdlResponse) <- append(class(bdlResponse), c("BdlResponse"))
+  if(is.null(responseFileName)) {
+    #if responseFileName is provided, it always takes precedence
+    if (inherits(bdlRequest, "BdlRequestBuilder") && "REPLYFILENAME" %in% names(bdlRequest$header)) {
+      responseFileName <- as.character(bdlRequest$header['REPLYFILENAME'])
+    } else if (!is.null(requestFileName)) {
+      file <- substr(requestFileName, 1, nchar(requestFileName)-4)
+      responseFileName <- paste0(file, '.out')
+    } else {
+      stop("must provide either bdlRequest as a BdlRequestBuilder object, requestFileName, or responseFileName")
+    }
+  }
   
-  return (bdlResponse)
+  return (responseFileName)
 }
 
 
 #' Download the data, if available
 #' 
-#' @param bdlResponse The BdlResponse object returned by the UploadRequest function
+#' @param bdlConnection The BdlConnection object used to establish the FTP download
+#' @param responseFileName The file downloaded
 #' 
 #' @return either NULL (if the file is not yet available) or a data.frame containing the data
-#' 
+#' @import stringr
 #' @seealso UploadRequest
+#' @seealso BdlResponseHandle
 #' @export
-GetBdlData <- function(bdlResponse) {
-  if (!inherits(bdlResponse,"BdlResponse")) stop("bdlResponse must be of class BdlResponse")
+TryGetBdlData <- function(bdlConnection, responseFileName) {
+  if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
+  if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
   
-  if ("REPLYFILENAME" %in% names(bdlResponse$bdlRequest$header)) {
-    replyFileName <- bdlResponse$bdlRequest$header$REPLYFILENAME
-  } else {
-    file <- substr(bdlResponse$targetFileName, 1, nchar(bdlResponse$targetFileName)-4)
-    replyFileName <- paste0(file, '.out')
-  }
-  
-  ftpDownloadResult <- DownloadFTP(bdlResponse$bdlConnection$connectionString , replyFileName, delete = FALSE)
+  ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
-    res <- ParseBdlResponseFile(ftpDownloadResult$content)
+    res <- ParseBdlResponse(ftpDownloadResult$content)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
     return (NULL)
@@ -61,7 +67,7 @@ GetBdlData <- function(bdlResponse) {
 #' @return a data.frame
 #'  
 #' @export
-ParseBdlResponseFile <- function(bdlOutContent) {
+ParseBdlResponse <- function(bdlOutContent) {
   #convert to data.frame
   
   #col names

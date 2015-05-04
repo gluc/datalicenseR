@@ -28,11 +28,7 @@ BdlConnection <- function(user,
     
     bdlConnection <- list();
     bdlConnection$connectionString <- connectionString
-    
-
-    
-    bdlConnection$UploadRequest <- UploadRequest
-    
+      
     class(bdlConnection) <- append(class(bdlConnection),"BdlConnection")
     
     return (bdlConnection)
@@ -40,26 +36,28 @@ BdlConnection <- function(user,
 }
 
 
-#' Uploads a BdlRequest to Bloomberg
+#' Uploads a request file to Bloomberg
 #' 
-#' @param bdlRequest A BdlRequest object
 #' @param bdlConnection A BdlConnection object
-#' @param targetFilePath The name the file should have at the Bloomberg FTP site 
-#' @return BdlResponse
+#' @param bdlRequest A BdlRequestBuilder object, or a character string containing the request content
+#' @param targetFileName The target file name of the request at the Bloomberg FTP site 
+#' @param responseFileName The name of the response file. If omitted, the method deducts 
+#' the response file name either from the BdlRequestBuilder, or from the targetFileName
+#' @return A character string, representing the name of the response file
 #' 
 #' @seealso BdlConnection
-#' @seealso BdlRequest
-#' @seealso BdlResponse
+#' @seealso BdlRequestBuilder
 #' 
 #' @export
-UploadRequest <- function(bdlRequest, bdlConnection, targetFilePath) {
-  if (!inherits(bdlRequest,"BdlRequest")) stop("bdlRequest must be of class BdlRequest")
+UploadRequest <- function(bdlConnection, bdlRequest, targetFileName, responseFileName = NULL) {
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
-  if (!inherits(targetFilePath,"character")) stop("targetFilePath must be of class character")
+  if (!(inherits(bdlRequest,"BdlRequestBuilder") || inherits(bdlRequest, "character"))) stop("bdlRequest must be of class BdlRequestBuilder or character")
+  if (!inherits(targetFileName,"character")) stop("targetFileName must be of class character")
+  if (!(is.null(responseFileName) || inherits(targetFileName,"character"))) stop("targetFileName must be of class character")
   
-  request <- print(bdlRequest)
-  UploadFTP(request, bdlConnection$connectionString, targetFilePath)
-  response <- BdlResponse(bdlRequest, bdlConnection, targetFilePath)
+  request <- as.character(bdlRequest)
+  UploadFTP(request, bdlConnection$connectionString, targetFileName)
+  response <- DeriveResponseFileName(bdlRequest, targetFileName, responseFileName)
   return (response)
 }
 

@@ -2,28 +2,30 @@
 % Please edit documentation in R/BdlConnection.R
 \name{UploadRequest}
 \alias{UploadRequest}
-\title{Uploads a BdlRequest to Bloomberg}
+\title{Uploads a request file to Bloomberg}
 \usage{
-UploadRequest(bdlRequest, bdlConnection, targetFilePath)
+UploadRequest(bdlConnection, bdlRequest, targetFileName,
+  responseFileName = NULL)
 }
 \arguments{
-\item{bdlRequest}{A BdlRequest object}
-
 \item{bdlConnection}{A BdlConnection object}
 
-\item{targetFilePath}{The name the file should have at the Bloomberg FTP site}
+\item{bdlRequest}{A BdlRequestBuilder object, or a character string containing the request content}
+
+\item{targetFileName}{The target file name of the request at the Bloomberg FTP site}
+
+\item{responseFileName}{The name of the response file. If omitted, the method deducts
+the response file name either from the BdlRequestBuilder, or from the targetFileName}
 }
 \value{
-BdlResponse
+A character string, representing the name of the response file
 }
 \description{
-Uploads a BdlRequest to Bloomberg
+Uploads a request file to Bloomberg
 }
 \seealso{
 BdlConnection
 
-BdlRequest
-
-BdlResponse
+BdlRequestBuilder
 }
 

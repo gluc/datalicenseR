@@ -9,50 +9,68 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+# Full Workflow
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+A standard workflow could look like this:
 
-## Vignette Info
+```{r eval=FALSE}
+library(datalicenseR)
+#there is no bloomberg-test, unfortunately. So use your assigned credentials and ftp server instead.
+bdlConnection <- BdlConnection(user = 'dl1234', pw = 'xyz123', 'bfmrr.bloomberg-test.com') 
 
-Note the various macros within the `vignette` setion of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+#refer to the Bloomberg documentation for details
+bdlRequest <- BdlRequestBuilder(
+                  header = c(FIRMNAME = 'dl1234', PROGRAMNAME = 'getdata', PROGRAMFLAG = 'oneshot'),
+                  fields = c('PX_LAST', 'PX_CLOSE'), 
+                  data = c('IBM US Equity', "INDU Index"))
 
-## Styles
+#derive out name from request file name
+responseFileName <- UploadRequest(bdlConnection,
+                                  bdlRequest, 
+                                  'test.req')
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+repeat {
+  res <- TryGetBdlData(bdlConnection, responseFileName)
+  if (!is.null(res)) break
+  Sys.sleep(5)
+}
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
 
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+The resulting data.frame then looks like this:
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r echo=FALSE}
+library(datalicenseR)
+data(response1)
+res <- response1
 ```
 
-Also a quote using `>`:
+```{r}
+res
+```
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+
+However, the various steps involved are also available as such, as the following sections show.
+
+# Upload a ready-made request file, without the Builder
+
+```{r eval=FALSE}
+fileName <- "tests/data/sample1.req"
+request <- readChar(fileName, file.info(fileName)$size)
+# The bdlRequest arg can be either a BdlRequestBuilder object, or - as is the
+# case here - a character string. 
+responseFileName <- UploadRequest(bdlConnection = bdlConnection, 
+                                  bdlRequest = request, 
+                                  targetFileName = 'test.req')
+```
+
+# Parse Bloomberg Response File, previously downloaded
+
+
+```{r eval=TRUE}
+fileName <- "../tests/data/sample1.out"
+content <- readChar(fileName, file.info(fileName)$size)
+response1 <- ParseBdlResponse(bdlOutContent = content)
+```
+
