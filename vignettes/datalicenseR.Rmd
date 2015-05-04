@@ -2,12 +2,13 @@
 title: "datalicenseR"
 author: "Christoph Glur"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{datalicenseR}
-  %\VignetteEngine{knitr::rmarkdown}
-  \usepackage[utf8]{inputenc}
 ---
+
+<!--
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{datalicenseR}
+-->
+
 
 # Full Workflow
 
