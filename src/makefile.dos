@@ -19,7 +19,7 @@
 # If you are on a DEC Alpha, edit des.h and change the DES_LONG
 # define to 'unsigned int'.  I have seen this give a %20 speedup.
 
-OPTS0= -DRAND -DTERMIO #-DNOCONST
+OPTS0= #-DRAND -DTERMIO -DNOCONST
 
 # Version 1.94 has changed the strings_to_key function so that it is
 # now compatible with MITs when the string is longer than 8 characters.
@@ -44,11 +44,15 @@ OPTS= $(OPTS0) $(OPTS1) $(OPTS2) $(OPTS3) $(OPTS4)
 #CFLAGS= -D_HPUX_SOURCE -Aa +O2 $(OPTS) $(CFLAG)
 
 CC=gcc
-CFLAGS= -O3 -fomit-frame-pointer $(OPTS) $(CFLAG)
+CFLAGS= -O3 -fomit-frame-pointer $(OPTS) -DMSDOS -DWIN32 -DSTANDALONE
 
 CPP=$(CC) -E
 
 DES_ENC=des_enc.o	# normal C version
+#DES_ENC=asm/dx86-elf.o	# elf format x86
+#DES_ENC=asm/dx86-out.o	# a.out format x86
+#DES_ENC=asm/dx86-sol.o	# solaris format x86 
+#DES_ENC=asm/dx86bsdi.o	# bsdi format x86 
 
 LIBDIR=/usr/local/lib
 BINDIR=/usr/local/bin
@@ -64,7 +68,7 @@ OBJS=	cbc3_enc.o cbc_cksm.o cbc_enc.o ncbc_enc.o pcbc_enc.o qud_cksm.o \
 	$(DES_ENC) xcbc_enc.o
 
 GENERAL=$(GENERAL_LIT) FILES Imakefile times vms.com KERBEROS MODES.DES \
-	makefile.gnu Makefile makefile.dos des.man DES.pm DES.pod DES.xs Makefile.PL \
+	GNUmakefile des.man DES.pm DES.pod DES.xs Makefile.PL \
 	Makefile.uni typemap t Makefile.ssl makefile.bc Makefile.lit \
 	des.org des_locl.org
 DES=	des.c
@@ -88,9 +92,9 @@ ALL=	$(GENERAL) $(DES) $(TESTING) $(LIBDES) $(PERL) $(HEADERS)
 
 DLIB=	libdes.a
 
-all:	
-	if test -d "C:/" ; then echo "building on Windows..."; make -f makefile.dos; else echo "buildin on *nix"; make -f Makefile.uni gcc; fi
-
+all:	$(DLIB) destest rpw des speed des_opts
+	
+	
 test:	all
 	./destest
 

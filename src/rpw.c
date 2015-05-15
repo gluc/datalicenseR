@@ -57,6 +57,11 @@
  */
 
 #include <stdio.h>
+#include "des_locl.h"
+
+/* on windows it shoud not be built if build started from R-Studio */
+#if !defined(MSDOS) || defined(STANDALONE)
+
 #include "des.h"
 
 int main(argc,argv)
@@ -99,3 +104,6 @@ char *argv[];
 	return(0);
 #endif
 	}
+
+
+#endif /* ifdef MSDOS */

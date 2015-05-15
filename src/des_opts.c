@@ -59,6 +59,11 @@
 /* define PART1, PART2, PART3 or PART4 to build only with a few of the options.
  * This is for machines with 64k code segment size restrictions. */
 
+#include "des_locl.h"
+
+/* on windows it shoud not be built if build started from R-Studio */
+#if !defined(MSDOS) || defined(STANDALONE)
+
 #ifndef MSDOS
 #define TIMES
 #endif
@@ -614,3 +619,5 @@ char **argv;
 	return(0);
 #endif
 	}
+
+#endif /* ifdef MSDOS */

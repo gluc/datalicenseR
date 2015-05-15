@@ -56,6 +56,11 @@
  * [including the GNU Public Licence.]
  */
 
+#include "des_locl.h"
+
+/* on windows it shoud not be built if build started from R-Studio */
+#if !defined(MSDOS) || defined(STANDALONE)
+
 #if defined(WIN32) || defined(WIN16) || defined(WINDOWS)
 #ifndef MSDOS
 #define MSDOS
@@ -854,3 +859,5 @@ unsigned char *cfb_cipher;
 
 #endif
 
+
+#endif /* ifdef MSDOS */

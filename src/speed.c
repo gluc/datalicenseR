@@ -59,16 +59,24 @@
 /* 11-Sep-92 Andrew Daviel   Support for Silicon Graphics IRIX added */
 /* 06-Apr-92 Luke Brennan    Support for VMS and add extra signal calls */
 
+#include "des_locl.h"
+
+/* on windows it shoud not be built if build started from R-Studio */
+#if !defined(MSDOS) || defined(STANDALONE)
+
+
 #ifndef MSDOS
 #define TIMES
 #endif
+
+#include "des_locl.h"
 
 #include <stdio.h>
 #ifndef MSDOS
 #include <unistd.h>
 #else
 #include <io.h>
-extern int exit();
+//extern int exit();
 #endif
 #include <signal.h>
 #ifndef VMS
@@ -323,3 +331,6 @@ char **argv;
 	return(0);
 #endif
 	}
+
+
+#endif /* ifdef MSDOS */
