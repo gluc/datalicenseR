@@ -67,6 +67,7 @@
 
 #include <time.h>
 #include "des_ver.h"
+#include "des_locl.h"
 
 #ifdef VMS
 #include <types.h>

@@ -67,7 +67,7 @@
 #ifndef HEADER_DES_LOCL_H
 #define HEADER_DES_LOCL_H
 
-#if defined(WIN32) || defined(WIN16)
+#if defined(WIN32) || defined(WIN16) || defined(_WINDOWS_)
 #ifndef MSDOS
 #define MSDOS
 #endif
@@ -159,6 +159,7 @@ YOU SHOULD NOT HAVE BOTH DES_RISC1 AND DES_RISC2 DEFINED!!!!!
 #define RAND
 #endif
 #undef NOPROTO
+#define Malloc malloc
 #endif
 
 #if defined(__STDC__) || defined(VMS) || defined(M_XENIX) || defined(MSDOS)

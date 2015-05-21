@@ -40,19 +40,15 @@ OPTS0= -DRAND -DTERMIO #-DNOCONST
 
 OPTS= $(OPTS0) $(OPTS1) $(OPTS2) $(OPTS3) $(OPTS4)
 
-CC=cc
-CFLAGS= -D_HPUX_SOURCE -Aa +O2 $(OPTS) $(CFLAG)
+#CC=cc
+#CFLAGS= -D_HPUX_SOURCE -Aa +O2 $(OPTS) $(CFLAG)
 
-#CC=gcc
-#CFLAGS= -O3 -fomit-frame-pointer $(OPTS) $(CFLAG)
+CC=gcc
+CFLAGS= -O3 -fomit-frame-pointer $(OPTS) $(CFLAG)
 
 CPP=$(CC) -E
 
 DES_ENC=des_enc.o	# normal C version
-#DES_ENC=asm/dx86-elf.o	# elf format x86
-#DES_ENC=asm/dx86-out.o	# a.out format x86
-#DES_ENC=asm/dx86-sol.o	# solaris format x86 
-#DES_ENC=asm/dx86bsdi.o	# bsdi format x86 
 
 LIBDIR=/usr/local/lib
 BINDIR=/usr/local/bin
@@ -68,7 +64,7 @@ OBJS=	cbc3_enc.o cbc_cksm.o cbc_enc.o ncbc_enc.o pcbc_enc.o qud_cksm.o \
 	$(DES_ENC) xcbc_enc.o
 
 GENERAL=$(GENERAL_LIT) FILES Imakefile times vms.com KERBEROS MODES.DES \
-	GNUmakefile des.man DES.pm DES.pod DES.xs Makefile.PL \
+	makefile.gnu Makefile makefile.dos des.man DES.pm DES.pod DES.xs Makefile.PL \
 	Makefile.uni typemap t Makefile.ssl makefile.bc Makefile.lit \
 	des.org des_locl.org
 DES=	des.c
@@ -92,37 +88,8 @@ ALL=	$(GENERAL) $(DES) $(TESTING) $(LIBDES) $(PERL) $(HEADERS)
 
 DLIB=	libdes.a
 
-all: $(DLIB) destest rpw des speed des_opts
-
-cc:
-	make CC=cc CFLAGS="-O $(OPTS) $(CFLAG)" all
-
-gcc:
-	make CC=gcc CFLAGS="-O3 -fomit-frame-pointer $(OPTS) $(CFLAG)" all
-
-x86-elf:
-	make DES_ENC=asm/dx86-elf.o CC=gcc CFLAGS="-DELF -O3 -fomit-frame-pointer $(OPTS) $(CFLAG)" all
-
-x86-out:
-	make DES_ENC=asm/dx86-out.o CC=gcc CFLAGS="-DOUT -O3 -fomit-frame-pointer $(OPTS) $(CFLAG)" all
-
-x86-solaris:
-	make DES_ENC=asm/dx86-sol.o CFLAGS="-DSOL -O  $(OPTS) $(CFLAG)" all
-
-x86-bsdi:
-	make DES_ENC=asm/dx86bsdi.o CC=gcc CFLAGS="-DBSDI -O3 -fomit-frame-pointer $(OPTS) $(CFLAG)" all
-
-asm/dx86-elf.o: asm/dx86-cpp.s asm/dx86unix.cpp
-	$(CPP) -DELF asm/dx86unix.cpp | as -o asm/dx86-elf.o
-
-asm/dx86-sol.o: asm/dx86-cpp.s asm/dx86unix.cpp
-	$(CPP) -DSOL asm/dx86unix.cpp | as -o asm/dx86-sol.o
-
-asm/dx86-out.o: asm/dx86-cpp.s asm/dx86unix.cpp
-	$(CPP) -DOUT asm/dx86unix.cpp | as -o asm/dx86-out.o
-
-asm/dx86bsdi.o: asm/dx86-cpp.s asm/dx86unix.cpp
-	$(CPP) -DBSDI asm/dx86unix.cpp | as -o asm/dx86bsdi.o
+all:	
+	if test -d "C:/" ; then echo "building on Windows..."; make -f makefile.dos; else echo "buildin on *nix"; make -f Makefile.uni gcc; fi
 
 test:	all
 	./destest
