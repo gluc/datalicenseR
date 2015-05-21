@@ -1,4 +1,5 @@
 library(stringr)
+library(libdes)
 
 #' Derives the expected response file name
 #'  
@@ -51,13 +52,24 @@ TryGetBdlData <- function(bdlConnection, responseFileName) {
   
   ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
-    res <- ParseBdlResponse(ftpDownloadResult$content)
+    decryptedResult <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key)
+    res <- ParseBdlResponse(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
     return (NULL)
   } else {
     stop(paste0(ftpDownloadResult$errorCode, ": ", ftpDownloadResult$errorMsg))
   }
+}
+
+#' @import libdes
+DecryptBdlResponse <- function(bdlContent, key) {
+  fileName <- tempfile()
+  decFile <- paste0(fileName, '.dec')
+  cat(bdlContent, file = fileName)
+  DecryptFile(fileName, decFile, key, UUENC = TRUE)
+  decryptedContent <- readChar(decFile, file.info(decFile)$size)
+  return (decryptedContent)
 }
 
 

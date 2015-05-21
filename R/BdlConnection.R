@@ -3,32 +3,35 @@
 #' 
 #' @param user The account number assigned by Bloomberg
 #' @param pw The password of your Bloomberg account
-#' @param host The Bloomberg ftp host
-#' @param encrypt If \code{TRUE}, then SFTP is used
-#' @param ftpType Any of \code{passive}, \code{active}
-#' @param port The port used by FTP (20 for active, 21 for passive connections) or by SFTP (30206)
-#' @param passivePorts In the case of ftpMode = 'passive', this is the min and the max port for the data port range.
-
+#' @param key The DES decryption key of your Bloomberg account
+#' 
 #' @return an S3 BdlConnection object, used to upload requests and download prices.
 #' @export
 BdlConnection <- function(user, 
-                          pw, 
-                          host = 'bfmrr.bloomberg.com', 
-                          encrypt = FALSE,
-                          ftpType = 'passive',
-                          port = 21, 
-                          passivePorts = c(32768, 65535)) {
+                          pw,
+                          key) {
  
   
+    sftp <- FALSE #libcurl doesn't support SFTP
+    if (sftp) {
+      host <- 'dlsftp.bloomberg.com'
+      port <- 30206
+      protocol <- 'sftp'
+    } else { 
+      host <- 'bfmrr.bloomberg.com'
+      port <- 21
+      protocol <- 'ftp'
+    }
+  
+    
   
     # ftp://User:Password@FTPServer/Destination.html
-    connectionString <- paste0('ftp://', user, ':', pw, '@', host)
-    
-    if (encrypt) connectionString <- paste0('s', connectionString)
+    connectionString <- paste0(protocol, '://', user, ':', pw, '@', host, ':', port)
     
     bdlConnection <- list();
     bdlConnection$connectionString <- connectionString
-      
+    bdlConnection$key <- key
+    
     class(bdlConnection) <- append(class(bdlConnection),"BdlConnection")
     
     return (bdlConnection)

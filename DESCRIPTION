@@ -2,12 +2,12 @@ Package: datalicenseR
 Type: Package
 Title: Bloomberg Datalicense Market Data Download
 Version: 0.1.0
-Date: 2015-04-27
+Date: 2015-05-21
 Author: Christoph Glur
 Maintainer: Christoph Glur <christoph.glur@ipub.ch>
 VignetteBuilder: knitr
 Imports:
-    RCurl, stringr, rmarkdown
+    RCurl, stringr, rmarkdown, libdes
 Suggests:
     testthat, knitr
 Description: Download prices, market data, and master data with the 
