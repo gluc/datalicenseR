@@ -2,6 +2,8 @@ language: r
 
 sudo: required
 
+- ./travis-tool.sh install_github gluc/libdes
+
 warnings_are_errors: true
 
 r_build_args: 
