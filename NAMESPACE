@@ -3,6 +3,7 @@
 S3method(as.character,BdlRequestBuilder)
 export(BdlConnection)
 export(BdlRequestBuilder)
+export(DownloadResponse)
 export(ParseBdlResponse)
 export(TryGetBdlData)
 export(UploadRequest)

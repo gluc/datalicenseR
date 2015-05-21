@@ -49,10 +49,10 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
 TryGetBdlData <- function(bdlConnection, responseFileName) {
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
-  
+  print(Sys.time())
   ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
-    decryptedResult <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key)
+    decryptedResult <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, responseFileName)
     res <- ParseBdlResponse(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
@@ -62,8 +62,29 @@ TryGetBdlData <- function(bdlConnection, responseFileName) {
   }
 }
 
+
+#' Download the data in sync mode, waiting until the result file is there
+#' 
+#' @param bdlConnection The BdlConnection object used to establish the FTP download
+#' @param responseFileName The file downloaded
+#' 
+#' @return the response content
+#' @seealso UploadRequest
+#' @seealso BdlResponseHandle
+#' @export
+DownloadResponse <- function(bdlConnection, responseFileName) {
+  res <- NULL
+  while (is.null(res)) {
+    print('File not yet available, waiting...')
+    Sys.sleep(time = 60)
+    res <- TryGetBdlData(con, respFileName)
+  }
+  return (res)
+}
+
+
 #' @import libdes
-DecryptBdlResponse <- function(bdlContent, key) {
+DecryptBdlResponse <- function(bdlContent, key, responseFileName) {
   fileName <- tempfile()
   decFile <- paste0(fileName, '.dec')
   cat(bdlContent, file = fileName)
@@ -107,7 +128,12 @@ ParseBdlResponse <- function(bdlOutContent) {
     df[rowNum, 'Status']  <- as.integer(dfCols[2])
     
     for (colNum in 4:(length(dfCols) - 1)) {
-      df[rowNum, colNum - 2] <- as.numeric(dfCols[colNum])
+      if( is.numeric(dfCols[colNum]) ) {
+        val <- as.numeric(dfCols[colNum])
+      } else {
+        val <- as.character(dfCols[colNum])
+      }
+      df[rowNum, colNum - 2] <- val
     }
     
     rownames(df)[rowNum] <- dfCols[1]
