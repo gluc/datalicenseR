@@ -49,7 +49,6 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
 TryGetBdlData <- function(bdlConnection, responseFileName) {
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
-  print(Sys.time())
   ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
     decryptedResult <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, responseFileName)
@@ -75,9 +74,12 @@ TryGetBdlData <- function(bdlConnection, responseFileName) {
 DownloadResponse <- function(bdlConnection, responseFileName) {
   res <- NULL
   while (is.null(res)) {
-    print('File not yet available, waiting...')
-    Sys.sleep(time = 60)
     res <- TryGetBdlData(con, respFileName)
+    if(is.null(res)) {
+      print('File not yet available, waiting...')
+      print(Sys.time())
+      Sys.sleep(time = 60)
+    }
   }
   return (res)
 }
