@@ -130,11 +130,8 @@ ParseBdlResponse <- function(bdlOutContent) {
     df[rowNum, 'Status']  <- as.integer(dfCols[2])
     
     for (colNum in 4:(length(dfCols) - 1)) {
-      if( is.numeric(dfCols[colNum]) ) {
-        val <- as.numeric(dfCols[colNum])
-      } else {
-        val <- as.character(dfCols[colNum])
-      }
+      val <- type.convert(dfCols[colNum], na.strings = c("NA", "N.A."))
+      if (is.factor(val)) val <- dfCols[colNum]
       df[rowNum, colNum - 2] <- val
     }
     
