@@ -1,7 +1,16 @@
 ---
 title: "datalicenseR"
 author: "Christoph Glur"
-date: "`r Sys.Date()`"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    self_contained: yes
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+  pdf_document:
+    toc: yes
+    toc_depth: 3
 ---
 
 <!--
