@@ -95,7 +95,12 @@ DownloadResponse <- function(bdlConnection, responseFileName) {
     if(is.null(res)) {
       print('File not yet available, waiting...')
       print(Sys.time())
-      Sys.sleep(time = 45)
+      for (x in 1:20) {
+        cat('.')
+        Sys.sleep(2)
+      }
+      cat('\r\n')
+      print("Checking if file is available...")
     }
   }
   return (res)
