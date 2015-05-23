@@ -32,6 +32,15 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
     }
   }
   
+  #if gzip
+  if ( inherits(bdlRequest, "BdlRequestBuilder") && 
+         (bdlRequest$header['COMPRESS'] == 'yes'||
+          bdlRequest$header['PROGRAMNAME'] %in% c('getquotes', 'getallquotes', 'gethistory')
+          )
+      ) {
+      responseFileName <- paste0(responseFileName, '.gz')
+  }
+  
   return (responseFileName)
 }
 
@@ -49,12 +58,20 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
 TryGetBdlData <- function(bdlConnection, responseFileName) {
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
+  iszip <- str_sub(responseFileName, start= -3) == '.gz'
   ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
-    decryptedResult <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, responseFileName)
+    
+    decFile <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, responseFileName, iszip)
+    
+    #decryptedResult <- readChar(decFile, file.info(decFile)$size)
+    decryptedResult <- paste0(readLines(decFile), collapse = '\r\n')
+    
     res <- ParseBdlResponse(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
+    return (NULL)
+  } else if(ftpDownloadResult$errorCode == 78) {
     return (NULL)
   } else {
     stop(paste0(ftpDownloadResult$errorCode, ": ", ftpDownloadResult$errorMsg))
@@ -78,7 +95,7 @@ DownloadResponse <- function(bdlConnection, responseFileName) {
     if(is.null(res)) {
       print('File not yet available, waiting...')
       print(Sys.time())
-      Sys.sleep(time = 60)
+      Sys.sleep(time = 45)
     }
   }
   return (res)
@@ -86,13 +103,13 @@ DownloadResponse <- function(bdlConnection, responseFileName) {
 
 
 #' @import libdes
-DecryptBdlResponse <- function(bdlContent, key, responseFileName) {
-  fileName <- tempfile()
+DecryptBdlResponse <- function(fileName, key, responseFileName, iszip) {
   decFile <- paste0(fileName, '.dec')
-  cat(bdlContent, file = fileName)
+  if (iszip) {
+    decFile <- paste0(decFile, '.gz')
+  }
   DecryptFile(fileName, decFile, key, UUENC = TRUE)
-  decryptedContent <- readChar(decFile, file.info(decFile)$size)
-  return (decryptedContent)
+  return (decFile)
 }
 
 

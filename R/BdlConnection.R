@@ -60,8 +60,9 @@ UploadRequest <- function(bdlConnection, bdlRequest, targetFileName, responseFil
   
   request <- as.character(bdlRequest)
   UploadFTP(request, bdlConnection$connectionString, targetFileName)
-  response <- DeriveResponseFileName(bdlRequest, targetFileName, responseFileName)
-  return (response)
+  responseFileName <- DeriveResponseFileName(bdlRequest, targetFileName, responseFileName)
+  DeleteFTPFile(bdlConnection$connectionString, responseFileName)
+  return (responseFileName)
 }
 
 
@@ -104,6 +105,7 @@ FTPDownloadResult <- function(content, success, errorMsg, errorCode) {
 }
 
 
+
 #' Downloads a file via FTP. 
 #' 
 #' @param baseURL The base URL
@@ -112,7 +114,26 @@ FTPDownloadResult <- function(content, success, errorMsg, errorCode) {
 #' 
 #' @return An FTPDownloadResult
 #' @seealso FTPDownloadResult
-DownloadFTP <- function(baseURL, filePath, delete = FALSE) {
+DownloadFTP_1 <- function(baseURL, filePath, delete = FALSE) {
+  url <- paste(baseURL, filePath, sep = '/')
+  destFile <- tempfile()
+  
+  code <- download.file(url, destfile = destFile, method = 'curl', quiet = TRUE)
+  res <- FTPDownloadResult(destFile, code == 0, '', code)
+  return (res)
+}
+
+
+
+#' Downloads a file via FTP. 
+#' 
+#' @param baseURL The base URL
+#' @param filePath The path to the file, relative from the baseURL
+#' @param delete Whether or not to delete the file after successful downloading
+#' 
+#' @return An FTPDownloadResult
+#' @seealso FTPDownloadResult
+DownloadFTP_2 <- function(baseURL, filePath, delete = FALSE) {
 
   #see here for libcurl options: http://stackoverflow.com/questions/17119449/rcurl-boolean-options
   #resp http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
@@ -133,5 +154,68 @@ DownloadFTP <- function(baseURL, filePath, delete = FALSE) {
               )
   
   res <- FTPDownloadResult(h$value(), is.null(e$errorCode), e$errorMsg, e$errorCode)
+  if (res$success) {
+    destFile <- tempfile()
+    cat(file = destFile)
+    res$content <- destFile
+  }
   return (res)
+}
+
+#' Downloads a file via FTP. 
+#' 
+#' @param baseURL The base URL
+#' @param filePath The path to the file, relative from the baseURL
+#' @param delete Whether or not to delete the file after successful downloading
+#' 
+#' @return An FTPDownloadResult
+#' @seealso FTPDownloadResult
+DownloadFTP <- function(baseURL, filePath, delete = FALSE) {
+  
+  #see here for libcurl options: http://stackoverflow.com/questions/17119449/rcurl-boolean-options
+  #resp http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
+  url <- paste(baseURL, filePath, sep = '/')
+  h <- basicTextGatherer()
+  e <- FTPErrorHandler() 
+  if (delete) postquote <- c(paste0("DELE ", '/', filePath))
+  else postquote <- c()
+  destFile <- tempfile()
+  file.create(destFile)
+  f = CFILE(destFile, 'w')
+  x <- tryCatch(curlPerform(url = url, 
+                            upload = FALSE, 
+                            curl = getCurlHandle(), 
+                            postquote = postquote, 
+                            writedata = f@ref),
+                #COULDNT_RESOLVE_HOST = function(x) e$handleError('COULDNT_RESOLVE_HOST', x$message)
+                REMOTE_FILE_NOT_FOUND = e$handleError
+                # error = function(x) e$handleError(x)  )
+  )
+  close(f)
+  res <- FTPDownloadResult(destFile, is.null(e$errorCode), e$errorMsg, e$errorCode)
+  return (res)
+}
+
+
+DeleteFTPFile <- function(baseURL, filePath) {
+  
+  #see here for libcurl options: http://stackoverflow.com/questions/17119449/rcurl-boolean-options
+  #resp http://curl.haxx.se/libcurl/c/curl_easy_setopt.html
+  url <- paste0(baseURL, sep = '/')
+  h <- basicTextGatherer()
+  e <- FTPErrorHandler() 
+  quote <- c(paste0("DELE ", '/', filePath))
+  
+  x <- tryCatch(curlPerform(url = url, 
+                            upload = FALSE, 
+                            curl = getCurlHandle(), 
+                            quote = quote, 
+                            writefunction = h$update),
+                #COULDNT_RESOLVE_HOST = function(x) e$handleError('COULDNT_RESOLVE_HOST', x$message)
+                REMOTE_FILE_NOT_FOUND = e$handleError,
+                error = function(x) e$handleError(x)
+  )
+  if (is.null(e$errorCode)) return (TRUE)
+  return (FALSE)
+
 }
