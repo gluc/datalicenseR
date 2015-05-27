@@ -4,12 +4,14 @@
 \alias{TryGetBdlData}
 \title{Download the data, if available}
 \usage{
-TryGetBdlData(bdlConnection, responseFileName)
+TryGetBdlData(bdlConnection, responseFileName, parser)
 }
 \arguments{
 \item{bdlConnection}{The BdlConnection object used to establish the FTP download}
 
 \item{responseFileName}{The file downloaded}
+
+\item{parser}{The parser used to convert the file into an R object}
 }
 \value{
 either NULL (if the file is not yet available) or a data.frame containing the data

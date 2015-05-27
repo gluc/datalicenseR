@@ -4,12 +4,14 @@
 \alias{DownloadResponse}
 \title{Download the data in sync mode, waiting until the result file is there}
 \usage{
-DownloadResponse(bdlConnection, responseFileName)
+DownloadResponse(bdlConnection, responseFileName, parser)
 }
 \arguments{
 \item{bdlConnection}{The BdlConnection object used to establish the FTP download}
 
 \item{responseFileName}{The file downloaded}
+
+\item{parser}{The parser used to convert the file into an R object}
 }
 \value{
 the response content

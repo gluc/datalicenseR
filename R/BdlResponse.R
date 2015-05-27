@@ -51,13 +51,14 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
 #' 
 #' @param bdlConnection The BdlConnection object used to establish the FTP download
 #' @param responseFileName The file downloaded
+#' @param parser The parser used to convert the file into an R object
 #' 
 #' @return either NULL (if the file is not yet available) or a data.frame containing the data
 #' @import stringr
 #' @seealso UploadRequest
 #' @seealso BdlResponseHandle
 #' @export
-TryGetBdlData <- function(bdlConnection, responseFileName) {
+TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
   iszip <- str_sub(responseFileName, start= -3) == '.gz'
@@ -69,7 +70,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName) {
     #decryptedResult <- readChar(decFile, file.info(decFile)$size)
     decryptedResult <- paste0(readLines(decFile), collapse = '\n')
     
-    res <- ParseBdlResponse(decryptedResult)
+    res <- parser(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
     return (NULL)
@@ -85,15 +86,16 @@ TryGetBdlData <- function(bdlConnection, responseFileName) {
 #' 
 #' @param bdlConnection The BdlConnection object used to establish the FTP download
 #' @param responseFileName The file downloaded
+#' @param parser The parser used to convert the file into an R object
 #' 
 #' @return the response content
 #' @seealso UploadRequest
 #' @seealso BdlResponseHandle
 #' @export
-DownloadResponse <- function(bdlConnection, responseFileName) {
+DownloadResponse <- function(bdlConnection, responseFileName, parser) {
   res <- NULL
   while (is.null(res)) {
-    res <- TryGetBdlData(bdlConnection, responseFileName)
+    res <- TryGetBdlData(bdlConnection, responseFileName, parser)
     if(is.null(res)) {
       print('File not yet available, waiting...')
       print(Sys.time())
@@ -122,53 +124,6 @@ DecryptBdlResponse <- function(fileName, key, iszip) {
 }
 
 
-#' Convert Bloomberg out file content to data.frame
-#' 
-#' @param bdlOutContent The content string
-#' @return a data.frame
-#'  
-#' @export
-ParseBdlResponse <- function(bdlOutContent) {
-  bdlOutContent <- str_replace(bdlOutContent, "/r", "")
-  
-  #convert to data.frame
-  
-  #col names
-  start <- str_locate(bdlOutContent, 'START-OF-FIELDS')[2] + 1
-  end <- str_locate(bdlOutContent, 'END-OF-FIELDS')[1] - 1
-  fieldsStr <- str_trim(str_sub(bdlOutContent, start, end))
-  colNames <- str_split(fieldsStr, '\n')[[1]]
-  colNames <- c('Status', colNames)
-  colClasses <- c('numeric', replicate(length(colNames) - 1, 'numeric'))
-  
-  
-  
-  #data
-  start <- str_locate(bdlOutContent, 'START-OF-DATA')[2] + 1
-  end <- str_locate(bdlOutContent, 'END-OF-DATA')[1] - 1
-  rowsStr <- str_trim(str_sub(bdlOutContent, start, end))
-  
-  rows <- str_split(rowsStr, '\n')[[1]]
-  
-  df <- read.table(text = "", colClasses = colClasses, col.names = colNames)
-  
-  for (rowNum in 1:length(rows)) {
-    dfCols <- str_trim(str_split(rows[rowNum], coll('|'))[[1]])
-    
-    df[rowNum, 'Status']  <- as.integer(dfCols[2])
-    
-    for (colNum in 4:(length(dfCols) - 1)) {
-      val <- type.convert(dfCols[colNum], na.strings = c("NA", "N.A."))
-      if (is.factor(val)) val <- dfCols[colNum]
-      df[rowNum, colNum - 2] <- val
-    }
-    
-    rownames(df)[rowNum] <- dfCols[1]
-  }
-  
-  return (df)
-  
-}
 
 
   
