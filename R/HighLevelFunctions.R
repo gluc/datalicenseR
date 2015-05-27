@@ -37,6 +37,8 @@ GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser) {
 #' @param key The DES decryption key of your Bloomberg account
 #' @param fields A vector of fields, e.g. c('PX_LAST', 'NAME')
 #' @param tickers A vector of Bloomberg tickers to be downloaded, e.g. c('SPX Index', 'IBM US Equity')
+#' @param fromDate The start date in your request
+#' @param toDate The end date in your request
 #' @param parser The parser used to convert the file into an R object
 #' 
 #' @import stringr

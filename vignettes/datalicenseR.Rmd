@@ -81,6 +81,6 @@ responseFileName <- UploadRequest(bdlConnection = bdlConnection,
 ```{r eval=TRUE}
 fileName <- system.file("extdata", "sample1.out", package="datalicenseR")
 content <- readChar(fileName, file.info(fileName)$size)
-response1 <- ParseBdlResponse(bdlOutContent = content)
+response1 <- GetDataParser(bdlOutContent = content)
 ```
 

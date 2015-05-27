@@ -18,6 +18,10 @@ GetHistory(user, pw, key, fields, tickers, fromDate, toDate = Sys.Date(),
 
 \item{tickers}{A vector of Bloomberg tickers to be downloaded, e.g. c('SPX Index', 'IBM US Equity')}
 
+\item{fromDate}{The start date in your request}
+
+\item{toDate}{The end date in your request}
+
 \item{parser}{The parser used to convert the file into an R object}
 }
 \description{

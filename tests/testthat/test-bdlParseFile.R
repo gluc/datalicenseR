@@ -6,7 +6,7 @@ test_that("BdlParseFile Simple sample1", {
   fileName <- system.file("extdata", "sample1.out", package="datalicenseR")
   bdlResponse <- readChar(fileName, file.info(fileName)$size)
   
-  bdlResponseDf <- ParseBdlResponse(bdlResponse)
+  bdlResponseDf <- GetDataParser(bdlResponse)
   expect_equal(class(bdlResponseDf), 'data.frame')
   expect_equal(nrow(bdlResponseDf), 2)
   expect_equal(rownames(bdlResponseDf), c('IBM US Equity', 'INDU Index'))
