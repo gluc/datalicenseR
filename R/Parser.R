@@ -53,7 +53,7 @@ GetDataParser <- function(bdlOutContent) {
 #' 
 #' @param bdlOutContent The content string
 #' @return an xts object containing the price series
-#'  
+#' @import xts
 #' @export
 GetHistoryParser <- function(bdlOutContent) {
   #decFile <- 'inst/extdata/gethist.out'
