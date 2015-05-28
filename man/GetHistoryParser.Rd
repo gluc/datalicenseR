@@ -10,7 +10,7 @@ GetHistoryParser(bdlOutContent)
 \item{bdlOutContent}{The content string}
 }
 \value{
-a data.frame
+an xts object containing the price series
 }
 \description{
 Convert Bloomberg out file content to data.frame

@@ -19,6 +19,10 @@ GetData(user, pw, key, fields, tickers, parser = GetDataParser)
 
 \item{parser}{The parser used to convert the file into an R object}
 }
+\value{
+An R object containing the downloaded data. If you use the default parser, then a data.frame
+is returned.
+}
 \description{
 This methods blocks call, until the file is available (which can be several minutes)
 }

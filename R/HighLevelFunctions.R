@@ -9,12 +9,19 @@
 #' @param tickers A vector of Bloomberg tickers to be downloaded, e.g. c('SPX Index', 'IBM US Equity')
 #' @param parser The parser used to convert the file into an R object
 #' 
+#' @return An R object containing the downloaded data. If you use the default parser, then a data.frame 
+#' is returned.
+#' 
 #' @import stringr
 #' @export
 GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser) {
   con <- BdlConnection(user, pw, key)
   
-  header <- c(FIRMNAME = user, PROGRAMNAME = 'getdata', PROGRAMFLAG = 'oneshot', PRICING = 'yes', COMPRESS = 'no')
+  header <- c(FIRMNAME = user, 
+              PROGRAMNAME = 'getdata', 
+              PROGRAMFLAG = 'oneshot', 
+              PRICING = 'yes', 
+              COMPRESS = 'no')
   
   req <- BdlRequestBuilder(header = header,
                            fields = fields, 
@@ -41,16 +48,22 @@ GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser) {
 #' @param toDate The end date in your request
 #' @param parser The parser used to convert the file into an R object
 #' 
+#' @return An R object containing the downloaded data. If you use the default parser, then an xts object
+#' is returned.
+#' 
 #' @import stringr
 #' @export
-GetHistory <- function(user, pw, key, fields, tickers, fromDate, toDate = Sys.Date(),  parser = GetHistoryParser) {
+GetHistory <- function(user, pw, key, 
+                       fields, tickers, 
+                       fromDate, toDate = Sys.Date(),  
+                       parser = GetHistoryParser) {
+  
   con <- BdlConnection(user, pw, key)
   fmt <- '%Y%m%d'
   dtrng <- paste0(format(as.Date(fromDate), fmt), '|', format(as.Date(toDate), fmt))
   header <- c(FIRMNAME = user, 
               PROGRAMNAME = 'gethistory', 
               DATERANGE = dtrng,              
-              PRICING = 'yes', 
               COMPRESS = 'yes')
   
   req <- BdlRequestBuilder(header = header,
