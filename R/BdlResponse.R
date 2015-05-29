@@ -62,14 +62,17 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
   iszip <- str_sub(responseFileName, start= -3) == '.gz'
+  print(paste0("downloading ftp ", responseFileName, "..."))
   ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
+    Sys.sleep(time = 2)
+    print("decrypting file...")
     
     decFile <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip)
-    
+    print("unzipping...")
     #decryptedResult <- readChar(decFile, file.info(decFile)$size)
     decryptedResult <- paste0(readLines(decFile), collapse = '\n')
-    
+    print("parsing...")
     res <- parser(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
@@ -95,7 +98,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
 DownloadResponse <- function(bdlConnection, responseFileName, parser) {
   res <- NULL
   while (is.null(res)) {
-    res <- TryGetBdlData(bdlConnection, responseFileName, parser)
+    reres <- TryGetBdlData(bdlConnection, responseFileName, parser)
     if(is.null(res)) {
       print('File not yet available, waiting...')
       print(Sys.time())
@@ -119,6 +122,7 @@ DecryptBdlResponse <- function(fileName, key, iszip) {
   if (iszip) {
     decFile <- paste0(decFile, '.gz')
   }
+  if(file.exists(decFile)) file.remove(decFile) #should not happen, is temp file
   DecryptFile(fileName, decFile, key, UUENC = TRUE)
   return (decFile)
 }
