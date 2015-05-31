@@ -65,7 +65,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
   print(paste0("downloading ftp ", responseFileName, "..."))
   ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
-    Sys.sleep(time = 2)
+    
     print("decrypting file...")
     
     decFile <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip)
@@ -98,7 +98,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
 DownloadResponse <- function(bdlConnection, responseFileName, parser) {
   res <- NULL
   while (is.null(res)) {
-    reres <- TryGetBdlData(bdlConnection, responseFileName, parser)
+    res <- TryGetBdlData(bdlConnection, responseFileName, parser)
     if(is.null(res)) {
       print('File not yet available, waiting...')
       print(Sys.time())
