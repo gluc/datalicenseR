@@ -63,8 +63,10 @@ GetHistoryParserList <- function(bdlOutContent) {
   resultList <- list()
   for (col in cols[-1]) {
     res <- xts(order.by = idx )
-    res <- merge(res, ParseGetHistoryCol(col, idx))
-    list[attr(res, 'ticker')] <- res
+    parseRes <- ParseGetHistoryCol(col, idx, FALSE)
+    res <- merge(res, parseRes)
+    ticker <- attr(parseRes, 'ticker')
+    resultList[[ticker]] <- res
   }
   
   return (resultList)
@@ -131,13 +133,17 @@ ParseGetHistoryIndex <- function(bdlOutContent) {
   idx <- seq(from = startDte, to = endDte, by = 1)
 }
 
-ParseGetHistoryCol <- function(col, idx) {
+ParseGetHistoryCol <- function(col, idx, tickerInColName = TRUE) {
   col <- str_replace(col, "[\n]", "")
   rows <- str_split(col, '[|]')[[1]]
   
   ticker <- rows[2]
   field <- rows[3]
-  colName <- str_replace( paste0(ticker, '.', field), " ", "_")
+  if(tickerInColName) {
+    colName <- str_replace( paste0(ticker, '.', field), " ", "_")
+  } else {
+    colName <- field
+  }
   #print(paste0("ticker ", ticker, " ", length(rows)))
   
   if (length(rows) - 4 < 5) {
