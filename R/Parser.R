@@ -51,8 +51,7 @@ GetDataParser <- function(bdlOutContent) {
 #' Convert Bloomberg out file content to a list of xts objects
 #' 
 #' @param bdlOutContent The content string
-#' @return an xts object containing the price series
-#' @import A list containing the xts objects
+#' @return A list containing the xts objects
 #' @export
 GetHistoryParserList <- function(bdlOutContent) {
   #decFile <- 'inst/extdata/gethist.out'

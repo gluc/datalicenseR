@@ -17,7 +17,7 @@ GetSnapshot(user, pw, key, tickers, snaptime, delayLimit = 3,
 
 \item{tickers}{A vector of Bloomberg tickers to be downloaded, e.g. c('SPX Index', 'IBM US Equity')}
 
-\item{snaptime}{A character string, containing the snapshot time, in the format %M%S, e.g. 0900}
+\item{snaptime}{A character string, containing the snapshot time, in the format MMSS, e.g. 0900}
 
 \item{delayLimit}{An integer, representing the maximum time Bloomberg should wait on the next price after
 the snaptime.}
