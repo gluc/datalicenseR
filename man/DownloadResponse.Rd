@@ -4,7 +4,8 @@
 \alias{DownloadResponse}
 \title{Download the data in sync mode, waiting until the result file is there}
 \usage{
-DownloadResponse(bdlConnection, responseFileName, parser)
+DownloadResponse(bdlConnection, responseFileName, parser,
+  pollFrequencySec = 40, timeoutMin = 10)
 }
 \arguments{
 \item{bdlConnection}{The BdlConnection object used to establish the FTP download}
@@ -12,6 +13,10 @@ DownloadResponse(bdlConnection, responseFileName, parser)
 \item{responseFileName}{The file downloaded}
 
 \item{parser}{The parser used to convert the file into an R object}
+
+\item{pollFrequencySec}{The polling frequency to check if file is available at Bloomberg}
+
+\item{timeoutMin}{The timeout in minutes}
 }
 \value{
 the response content
