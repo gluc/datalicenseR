@@ -134,9 +134,9 @@ GetSnapshot <- function(user, pw, key,
   }
   
   res <- list()
-  list$response <- response
-  list$GetReply <- callback
-  list$connection <- con
-  list$replyFileName <- replyFileName
+  res$response <- response
+  res$GetReply <- callback
+  res$connection <- con
+  res$replyFileName <- replyFileName
   
 }

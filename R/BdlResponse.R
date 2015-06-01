@@ -90,23 +90,40 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
 #' @param bdlConnection The BdlConnection object used to establish the FTP download
 #' @param responseFileName The file downloaded
 #' @param parser The parser used to convert the file into an R object
+#' @param pollFrequencySec The polling frequency to check if file is available at Bloomberg
+#' @param timeoutMin The timeout in minutes
 #' 
 #' @return the response content
 #' @seealso UploadRequest
 #' @seealso BdlResponseHandle
 #' @export
-DownloadResponse <- function(bdlConnection, responseFileName, parser) {
+DownloadResponse <- function(bdlConnection, responseFileName, parser, pollFrequencySec = 40, timeoutMin = 10) {
+  if(pollFrequencySec < 0) stop("pollFrequencySec must be > 0")
+  if(timeoutMin < 0) stop("timeoutMin must be > 0")
+  
+  if(pollFrequencySec <= 20) warning("pollFrequencySec is recommended to be > 20")
+  if(timeoutMin <= 3) warning("timeoutMin is recommended to be > 3")
+  
+  
   res <- NULL
+  timeoutSec <- 60 * timeoutMin
+  myTime <- 0
   while (is.null(res)) {
     res <- TryGetBdlData(bdlConnection, responseFileName, parser)
     if(is.null(res)) {
       print('File not yet available, waiting...')
       print(Sys.time())
-      for (x in 1:20) {
+      for (x in 1:as.integer(pollFrequencySec / 2)) {
         cat('.')
         Sys.sleep(2)
       }
+      myTime <- myTime + pollFrequencySec
       cat('\r\n')
+      if (myTime > timeoutSec) {
+        print(paste0('Timeout! Could not download file ', responseFileName, ' from bloomberg in ', timeoutMin, ' min. Giving up!'))
+        return (NULL)
+      }
+      
       print("Checking if file is available...")
     } else {
       print('File available! Downloading...')
