@@ -21,6 +21,7 @@ GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser) {
               PROGRAMNAME = 'getdata', 
               PROGRAMFLAG = 'oneshot', 
               PRICING = 'yes', 
+              FUNDAMENTALS = 'yes',
               COMPRESS = 'no')
   
   req <- BdlRequestBuilder(header = header,
@@ -112,7 +113,8 @@ GetSnapshot <- function(user, pw, key,
   header <- c(FIRMNAME = user, 
               PROGRAMNAME = 'getsnap', 
               SNAPTIME = snaptime,
-              DELAY_LIMIT = delayLimit)
+              DELAY_LIMIT = delayLimit,
+              COLUMNHEADER = 'yes')
   
   req <- BdlRequestBuilder(header = header,
                            fields = vector(mode = "character"), 

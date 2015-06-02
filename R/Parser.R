@@ -13,10 +13,9 @@ GetDataParser <- function(bdlOutContent) {
   start <- str_locate(bdlOutContent, 'START-OF-FIELDS')[2] + 1
   end <- str_locate(bdlOutContent, 'END-OF-FIELDS')[1] - 1
   fieldsStr <- str_trim(str_sub(bdlOutContent, start, end))
-  colNames <- str_split(fieldsStr, '\n')[[1]]
-  colNames <- c('Status', colNames)
-  colClasses <- c('numeric', replicate(length(colNames) - 1, 'numeric'))
   
+  #col headers?
+  columnHeaders <- !is.na(str_locate(bdlOutContent, 'COLUMNHEADER=yes')[1])
   
   
   #data
@@ -26,16 +25,25 @@ GetDataParser <- function(bdlOutContent) {
   
   rows <- str_split(rowsStr, '\n')[[1]]
   
-  df <- read.table(text = "", colClasses = colClasses, col.names = colNames)
   
+  
+  if (columnHeaders) {
+    colNames <- head(str_trim(str_split(rows[1], coll('|'))[[1]])[-1],-1)[-2]
+    rows <- rows[-1]
+  } else {
+    colNames <- str_split(fieldsStr, '\n')[[1]]
+    colNames <- c('ERROR CODE', colNames)
+  }
+  colNames <- str_replace_all(colNames, " ", "_")
+  colClasses <- c('numeric', replicate(length(colNames) - 1, 'numeric'))
+  df <- read.table(text = "", colClasses = colClasses, col.names = colNames)
   for (rowNum in 1:length(rows)) {
     dfCols <- str_trim(str_split(rows[rowNum], coll('|'))[[1]])
     
-    df[rowNum, 'Status']  <- as.integer(dfCols[2])
+    df[rowNum, 'ERROR_CODE']  <- as.integer(dfCols[2])
     
     for (colNum in 4:(length(dfCols) - 1)) {
-      val <- type.convert(dfCols[colNum], na.strings = c("NA", "N.A."))
-      if (is.factor(val)) val <- dfCols[colNum]
+      val <- ParseBdlField(dfCols[colNum], colNames[colNum - 2])
       df[rowNum, colNum - 2] <- val
     }
     
@@ -46,6 +54,22 @@ GetDataParser <- function(bdlOutContent) {
   
 }
 
+
+ParseBdlField <- function(value, fieldName) {
+  val <- type.convert(value, na.strings = c("NA", "N.A."), as.is = TRUE)
+  if(FALSE) {
+    #does not work yet
+    type <- subset(bdlFields, rownames(bdlFields) == fieldName, 'Field.Type', drop = TRUE)
+    
+    if(length(type) == 0) {
+      type <- subset(bdlFields, toupper(str_replace_all(bdlFields$Description, " ", "_")) == fieldName, 'Field.Type', drop = TRUE)
+    }
+    if (length(type) > 0 && type %in% c('Date', 'Date or Time', 'Time')) {
+      val <- as.Date(val)
+    }
+  }
+  return (val)
+}
 
 
 #' Convert Bloomberg out file content to a list of xts objects
@@ -169,7 +193,8 @@ ParseGetHistoryCol <- function(col, idx, tickerInColName = TRUE) {
 #' @return a data frame object containing the price series
 #' @export
 GetSnapshotResponseParser <- function(bdlOutContent) {
-  return (GetDataParser(bdlOutContent))
+  response <- GetDataParser(bdlOutContent)
+  return (response)
 }
 
 
