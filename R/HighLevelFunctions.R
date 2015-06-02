@@ -89,7 +89,9 @@ GetHistory <- function(user, pw, key,
 #' @param pw The password of your Bloomberg account
 #' @param key The DES decryption key of your Bloomberg account
 #' @param tickers A vector of Bloomberg tickers to be downloaded, e.g. c('SPX Index', 'IBM US Equity')
-#' @param snaptime A character string, containing the snapshot time, in the format MMSS, e.g. 0900
+#' @param snaptime A character string, containing the snapshot time, in the format HHMM, and only
+#' half-hours are allowed. Also, the timezone of the snapshot is your Bloomberg region (either
+#' NY, LONDON, or TOKYO), e.g. 0930
 #' @param delayLimit An integer, representing the maximum time Bloomberg should wait on the next price after
 #' the snaptime.
 #' @param responseParser The parser used to convert the response file into an R object
@@ -138,5 +140,6 @@ GetSnapshot <- function(user, pw, key,
   res$GetReply <- callback
   res$connection <- con
   res$replyFileName <- replyFileName
+  return (res)
   
 }

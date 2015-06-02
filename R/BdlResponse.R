@@ -76,8 +76,10 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
     res <- parser(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
+    print(paste0("file ", responseFileName, " not yet available"))
     return (NULL)
   } else if(ftpDownloadResult$errorCode == 78) {
+    print(paste0("file ", responseFileName, " not yet available"))
     return (NULL)
   } else {
     stop(paste0(ftpDownloadResult$errorCode, ": ", ftpDownloadResult$errorMsg))
