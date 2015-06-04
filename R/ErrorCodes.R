@@ -8,7 +8,7 @@ GetSnapshotErrorMessage <- function(errorCode) {
   f <- function(errorCode) {
     if ( errorCode == 0 ) return ('Good return. No errors occurred.')
     if ( errorCode == 10 ) return ('Bloomberg cannot find the security as specified.')
-    if ( errorCode == 11 ) return ('Restricted Security. Must link to BLOOMBERG PROFESSIONAL® Service with access.')
+    if ( errorCode == 11 ) return ('Restricted Security. Must link to BLOOMBERG PROFESSIONAL (R) Service with access.')
     if ( errorCode == 100 ) return ('Maximum number of securities exceeded (20,000)')
     if ( errorCode == 150 ) return ('Security blocked due to embargo not being met')
     if ( errorCode == 988 ) return ('System Error on security level')
