@@ -12,7 +12,7 @@ test_that("BdlParseFile Simple sample1", {
   expect_equal(rownames(bdlResponseDf), c('IBM US Equity', 'INDU Index'))
   
   expect_equal(ncol(bdlResponseDf), 3)
-  expect_equal(colnames(bdlResponseDf), c('Status', 'PX_LAST', 'PX_CLOSE'))
+  expect_equal(colnames(bdlResponseDf), c('ERROR_CODE', 'PX_LAST', 'PX_CLOSE'))
   
   expect_equal(bdlResponseDf[ , 1], c(0,0))
   expect_equal(bdlResponseDf[ , 2], c(105.23, 17840.52))
