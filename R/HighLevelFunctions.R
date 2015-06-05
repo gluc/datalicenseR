@@ -8,13 +8,14 @@
 #' @param fields A vector of fields, e.g. c('PX_LAST', 'NAME')
 #' @param tickers A vector of Bloomberg tickers to be downloaded, e.g. c('SPX Index', 'IBM US Equity')
 #' @param parser The parser used to convert the file into an R object
+#' @param verbose Prints output if TRUE
 #' 
 #' @return An R object containing the downloaded data. If you use the default parser, then a data.frame 
 #' is returned.
 #' 
 #' @import stringr
 #' @export
-GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser) {
+GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser, verbose = FALSE) {
   con <- BdlConnection(user, pw, key)
   
   header <- c(FIRMNAME = user, 
@@ -29,9 +30,9 @@ GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser) {
                            data = tickers)
   
   fileName <- str_sub(tempfile(pattern = "getdata_", tmpdir = "", fileext = ".req"), start = 2)
-  respFileName <- UploadRequest(con, req, fileName)
+  respFileName <- UploadRequest(con, req, fileName, verbose)
     
-  res <- DownloadResponse(con, respFileName, parser)
+  res <- DownloadResponse(con, respFileName, parser, verbose)
   return (res)
 }
 
@@ -48,6 +49,7 @@ GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser) {
 #' @param fromDate The start date in your request
 #' @param toDate The end date in your request
 #' @param parser The parser used to convert the file into an R object
+#' @param verbose Prints output if TRUE
 #' 
 #' @return An R object containing the downloaded data. If you use the default parser, then an xts object
 #' is returned.
@@ -57,7 +59,8 @@ GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser) {
 GetHistory <- function(user, pw, key, 
                        fields, tickers, 
                        fromDate, toDate = Sys.Date(),  
-                       parser = GetHistoryParser) {
+                       parser = GetHistoryParser,
+                       verbose = FALSE) {
   
   con <- BdlConnection(user, pw, key)
   fmt <- '%Y%m%d'
@@ -72,9 +75,9 @@ GetHistory <- function(user, pw, key,
                            data = tickers)
   
   fileName <- str_sub(tempfile(pattern = "gethist_", tmpdir = "", fileext = ".req"), start = 2)
-  respFileName <- UploadRequest(con, req, fileName)
+  respFileName <- UploadRequest(con, req, fileName, verbose)
   
-  res <- DownloadResponse(con, respFileName, parser)
+  res <- DownloadResponse(con, respFileName, parser, verbose)
   return (res)
 }
 
@@ -97,6 +100,7 @@ GetHistory <- function(user, pw, key,
 #' the snaptime.
 #' @param responseParser The parser used to convert the response file into an R object
 #' @param replyParser The parser used to convert the reply file into an R object
+#' @param verbose Prints output if TRUE
 #' 
 #' @return A list containing the response file, as well as a callback to fetch the reply.
 #' 
@@ -108,7 +112,8 @@ GetSnapshot <- function(user, pw, key,
                         delayLimit = 3,
                         sync = FALSE,
                         responseParser = GetSnapshotResponseParser,
-                        replyParser = GetSnapshotReplyParser) {
+                        replyParser = GetSnapshotReplyParser,
+                        verbose = FALSE) {
   
   con <- BdlConnection(user, pw, key)
   header <- c(FIRMNAME = user, 
@@ -122,7 +127,7 @@ GetSnapshot <- function(user, pw, key,
                            data = tickers)
   
   fileName <- str_sub(tempfile(pattern = "getsnap_", tmpdir = "", fileext = ".req"), start = 2)
-  replyFileName <- UploadRequest(con, req, fileName)
+  replyFileName <- UploadRequest(con, req, fileName, verbose)
   
   if(FALSE) {
     # DEBUG
@@ -132,10 +137,10 @@ GetSnapshot <- function(user, pw, key,
     replyParser <- GetSnapshotReplyParser
   }
   responseFileName <- paste0(fileName, '.', 'resp')
-  response <- DownloadResponse(con, responseFileName, responseParser)
+  response <- DownloadResponse(con, responseFileName, responseParser, verbose)
   
   callback <- function() {
-    TryGetBdlData(con, replyFileName, replyParser)
+    TryGetBdlData(con, replyFileName, replyParser, verbose)
   }
   res <- list()
   if (sync) {
@@ -143,7 +148,7 @@ GetSnapshot <- function(user, pw, key,
       cat('.')
       Sys.sleep(10)
     }
-    reply <- DownloadResponse(con, replyFileName, replyParser, pollFrequencySec = 300, timeoutMin = 120)
+    reply <- DownloadResponse(con, replyFileName, replyParser, pollFrequencySec = 300, timeoutMin = 120, verbose)
     res$reply <- reply  
   }
   
