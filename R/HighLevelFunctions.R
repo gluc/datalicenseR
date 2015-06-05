@@ -30,9 +30,9 @@ GetData <- function(user, pw, key, fields, tickers, parser = GetDataParser, verb
                            data = tickers)
   
   fileName <- str_sub(tempfile(pattern = "getdata_", tmpdir = "", fileext = ".req"), start = 2)
-  respFileName <- UploadRequest(con, req, fileName, verbose)
+  respFileName <- UploadRequest(con, req, fileName, verbose = verbose)
     
-  res <- DownloadResponse(con, respFileName, parser, verbose)
+  res <- DownloadResponse(con, respFileName, parser, verbose = verbose)
   return (res)
 }
 
@@ -75,9 +75,9 @@ GetHistory <- function(user, pw, key,
                            data = tickers)
   
   fileName <- str_sub(tempfile(pattern = "gethist_", tmpdir = "", fileext = ".req"), start = 2)
-  respFileName <- UploadRequest(con, req, fileName, verbose)
+  respFileName <- UploadRequest(con, req, fileName, verbose = verbose)
   
-  res <- DownloadResponse(con, respFileName, parser, verbose)
+  res <- DownloadResponse(con, respFileName, parser, verbose = verbose)
   return (res)
 }
 
@@ -88,6 +88,7 @@ GetHistory <- function(user, pw, key,
 #' The program getsnap returns two files: one response file containing some errorcodes and masterdate.
 #' It can be used to check if the request was OK.
 #' Some time after the snaptime, the reply file is made available. It contains the actual prices.
+#' See \code{sync} for 
 #' 
 #' @param user The account number assigned by Bloomberg
 #' @param pw The password of your Bloomberg account
@@ -98,6 +99,7 @@ GetHistory <- function(user, pw, key,
 #' NY, LONDON, or TOKYO), e.g. 0930
 #' @param delayLimit An integer, representing the maximum time Bloomberg should wait on the next price after
 #' the snaptime.
+#' @param sync if TRUE 
 #' @param responseParser The parser used to convert the response file into an R object
 #' @param replyParser The parser used to convert the reply file into an R object
 #' @param verbose Prints output if TRUE
@@ -127,7 +129,7 @@ GetSnapshot <- function(user, pw, key,
                            data = tickers)
   
   fileName <- str_sub(tempfile(pattern = "getsnap_", tmpdir = "", fileext = ".req"), start = 2)
-  replyFileName <- UploadRequest(con, req, fileName, verbose)
+  replyFileName <- UploadRequest(con, req, fileName, verbose = verbose)
   
   if(FALSE) {
     # DEBUG
@@ -137,18 +139,25 @@ GetSnapshot <- function(user, pw, key,
     replyParser <- GetSnapshotReplyParser
   }
   responseFileName <- paste0(fileName, '.', 'resp')
-  response <- DownloadResponse(con, responseFileName, responseParser, verbose)
+  response <- DownloadResponse(con, responseFileName, responseParser, verbose = verbose)
+  
+  if (is.null(response)) {
+    warning("Could not download response file!")
+    return (NULL)
+  }
   
   callback <- function() {
-    TryGetBdlData(con, replyFileName, replyParser, verbose)
+    TryGetBdlData(con, replyFileName, replyParser, verbose = verbose)
   }
   res <- list()
   if (sync) {
+    
     for (x in 1:as.integer(90)) {
-      cat('.')
+      if(verbose) cat('.')
       Sys.sleep(10)
     }
-    reply <- DownloadResponse(con, replyFileName, replyParser, pollFrequencySec = 300, timeoutMin = 120, verbose)
+    if (verbose) cat('\r\n')
+    reply <- DownloadResponse(con, replyFileName, replyParser, pollFrequencySec = 300, timeoutMin = 120, verbose = verbose)
     res$reply <- reply  
   }
   
