@@ -1,10 +1,12 @@
 #' Convert Bloomberg out file content to data.frame
 #' 
 #' @param bdlOutContent The content string
+#' @param columnHeader If TRUE, then column headers are auto detected. If FALSE, then it
+#' is assumed no column headers exist.
 #' @return a data.frame
 #'  
 #' @export
-GetDataParser <- function(bdlOutContent) {
+GetDataParser <- function(bdlOutContent, columnHeader = TRUE) {
   bdlOutContent <- str_replace_all(bdlOutContent, "[\r]", "")
   
   #convert to data.frame
@@ -15,8 +17,11 @@ GetDataParser <- function(bdlOutContent) {
   fieldsStr <- str_trim(str_sub(bdlOutContent, start, end))
   
   #col headers?
-  columnHeaders <- !is.na(str_locate(bdlOutContent, 'COLUMNHEADER=yes')[1])
-  
+  if (columnHeader) {
+    columnHeaders <- !is.na(str_locate(bdlOutContent, 'COLUMNHEADER=yes')[1])
+  } else {
+    columnHeaders <- FALSE
+  }
   
   #data
   start <- str_locate(bdlOutContent, 'START-OF-DATA')[2] + 1
@@ -184,7 +189,7 @@ ParseGetHistoryCol <- function(col, idx, tickerInColName = TRUE) {
 }
 
 
-#' Convert Bloomberg out file content to data.frame
+#' Convert Bloomberg resp file content to data.frame
 #' 
 #' The Response file can be used to check if there are any exceptions.
 #' It does not contain the actual price data.
@@ -193,7 +198,7 @@ ParseGetHistoryCol <- function(col, idx, tickerInColName = TRUE) {
 #' @return a data frame object containing the price series
 #' @export
 GetSnapshotResponseParser <- function(bdlOutContent) {
-  response <- GetDataParser(bdlOutContent)
+  response <- GetDataParser(bdlOutContent, FALSE)
   return (response)
 }
 

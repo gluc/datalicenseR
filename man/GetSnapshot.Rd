@@ -4,7 +4,7 @@
 \alias{GetSnapshot}
 \title{Download data from Bloomberg using the getsnap program.}
 \usage{
-GetSnapshot(user, pw, key, tickers, snaptime, delayLimit = 3,
+GetSnapshot(user, pw, key, tickers, snaptime, delayLimit = 3, sync = FALSE,
   responseParser = GetSnapshotResponseParser,
   replyParser = GetSnapshotReplyParser)
 }

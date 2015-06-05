@@ -4,10 +4,13 @@
 \alias{GetDataParser}
 \title{Convert Bloomberg out file content to data.frame}
 \usage{
-GetDataParser(bdlOutContent)
+GetDataParser(bdlOutContent, columnHeader = TRUE)
 }
 \arguments{
 \item{bdlOutContent}{The content string}
+
+\item{columnHeader}{If TRUE, then column headers are auto detected. If FALSE, then it
+is assumed no column headers exist.}
 }
 \value{
 a data.frame

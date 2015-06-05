@@ -5,7 +5,7 @@
 \title{Uploads a request file to Bloomberg}
 \usage{
 UploadRequest(bdlConnection, bdlRequest, targetFileName,
-  responseFileName = NULL)
+  responseFileName = NULL, verbose = FALSE)
 }
 \arguments{
 \item{bdlConnection}{A BdlConnection object}
@@ -16,6 +16,8 @@ UploadRequest(bdlConnection, bdlRequest, targetFileName,
 
 \item{responseFileName}{The name of the response file. If omitted, the method deducts
 the response file name either from the BdlRequestBuilder, or from the targetFileName}
+
+\item{verbose}{Prints output if TRUE}
 }
 \value{
 A character string, representing the name of the response file

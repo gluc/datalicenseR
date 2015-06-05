@@ -2,7 +2,7 @@
 % Please edit documentation in R/Parser.R
 \name{GetSnapshotResponseParser}
 \alias{GetSnapshotResponseParser}
-\title{Convert Bloomberg out file content to data.frame}
+\title{Convert Bloomberg resp file content to data.frame}
 \usage{
 GetSnapshotResponseParser(bdlOutContent)
 }
