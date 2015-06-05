@@ -46,13 +46,14 @@ BdlConnection <- function(user,
 #' @param targetFileName The target file name of the request at the Bloomberg FTP site 
 #' @param responseFileName The name of the response file. If omitted, the method deducts 
 #' the response file name either from the BdlRequestBuilder, or from the targetFileName
+#' @param verbose Prints output if TRUE
 #' @return A character string, representing the name of the response file
 #' 
 #' @seealso BdlConnection
 #' @seealso BdlRequestBuilder
 #' 
 #' @export
-UploadRequest <- function(bdlConnection, bdlRequest, targetFileName, responseFileName = NULL) {
+UploadRequest <- function(bdlConnection, bdlRequest, targetFileName, responseFileName = NULL, verbose = FALSE) {
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!(inherits(bdlRequest,"BdlRequestBuilder") || inherits(bdlRequest, "character"))) stop("bdlRequest must be of class BdlRequestBuilder or character")
   if (!inherits(targetFileName,"character")) stop("targetFileName must be of class character")

@@ -52,34 +52,35 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
 #' @param bdlConnection The BdlConnection object used to establish the FTP download
 #' @param responseFileName The file downloaded
 #' @param parser The parser used to convert the file into an R object
+#' @param verbose Prints progress output if TRUE
 #' 
 #' @return either NULL (if the file is not yet available) or a data.frame containing the data
 #' @import stringr
 #' @seealso UploadRequest
 #' @seealso BdlResponseHandle
 #' @export
-TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
+TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FALSE) {
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
   iszip <- str_sub(responseFileName, start= -3) == '.gz'
-  print(paste0("downloading ftp ", responseFileName, "..."))
+  if (verbose) print(paste0("downloading ftp ", responseFileName, "..."))
   ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
     
-    print("decrypting file...")
+    if (verbose) print("decrypting file...")
     
     decFile <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip)
-    print("unzipping...")
+    if (verbose) print("unzipping...")
     #decryptedResult <- readChar(decFile, file.info(decFile)$size)
     decryptedResult <- paste0(readLines(decFile), collapse = '\n')
-    print("parsing...")
+    if (verbose) print("parsing...")
     res <- parser(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
-    print(paste0("file ", responseFileName, " not yet available"))
+    if (verbose) print(paste0("file ", responseFileName, " not yet available"))
     return (NULL)
   } else if(ftpDownloadResult$errorCode == 78) {
-    print(paste0("file ", responseFileName, " not yet available"))
+    if (verbose) print(paste0("file ", responseFileName, " not yet available"))
     return (NULL)
   } else {
     stop(paste0(ftpDownloadResult$errorCode, ": ", ftpDownloadResult$errorMsg))
@@ -92,6 +93,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
 #' @param bdlConnection The BdlConnection object used to establish the FTP download
 #' @param responseFileName The file downloaded
 #' @param parser The parser used to convert the file into an R object
+#' @param verbose Prints progress output if TRUE
 #' @param pollFrequencySec The polling frequency to check if file is available at Bloomberg
 #' @param timeoutMin The timeout in minutes
 #' 
@@ -99,7 +101,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser) {
 #' @seealso UploadRequest
 #' @seealso BdlResponseHandle
 #' @export
-DownloadResponse <- function(bdlConnection, responseFileName, parser, pollFrequencySec = 40, timeoutMin = 10) {
+DownloadResponse <- function(bdlConnection, responseFileName, parser, pollFrequencySec = 40, timeoutMin = 10, verbose = FALSE) {
   if(pollFrequencySec < 0) stop("pollFrequencySec must be > 0")
   if(timeoutMin < 0) stop("timeoutMin must be > 0")
   
@@ -111,24 +113,24 @@ DownloadResponse <- function(bdlConnection, responseFileName, parser, pollFreque
   timeoutSec <- 60 * timeoutMin
   myTime <- 0
   while (is.null(res)) {
-    res <- TryGetBdlData(bdlConnection, responseFileName, parser)
+    res <- TryGetBdlData(bdlConnection, responseFileName, parser, verbose)
     if(is.null(res)) {
-      print('File not yet available, waiting...')
-      print(Sys.time())
+      if (verbose) print('File not yet available, waiting...')
+      if (verbose) print(Sys.time())
       for (x in 1:as.integer(pollFrequencySec / 2)) {
-        cat('.')
+        if (verbose) cat('.')
         Sys.sleep(2)
       }
       myTime <- myTime + pollFrequencySec
-      cat('\r\n')
+      if (verbose) cat('\r\n')
       if (myTime > timeoutSec) {
         print(paste0('Timeout! Could not download file ', responseFileName, ' from bloomberg in ', timeoutMin, ' min. Giving up!'))
         return (NULL)
       }
       
-      print("Checking if file is available...")
+      if (verbose) print("Checking if file is available...")
     } else {
-      print('File available! Downloading...')
+      if (verbose) print('File available! Downloading...')
     }
   }
   return (res)
