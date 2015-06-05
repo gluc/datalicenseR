@@ -5,7 +5,7 @@
 \title{Download data from Bloomberg using the gethistory program.}
 \usage{
 GetHistory(user, pw, key, fields, tickers, fromDate, toDate = Sys.Date(),
-  parser = GetHistoryParser)
+  sync = TRUE, parser = GetHistoryParser, verbose = FALSE)
 }
 \arguments{
 \item{user}{The account number assigned by Bloomberg}
@@ -22,10 +22,14 @@ GetHistory(user, pw, key, fields, tickers, fromDate, toDate = Sys.Date(),
 
 \item{toDate}{The end date in your request}
 
+\item{sync}{If TRUE, then the call will not return until the file is available, or until it times out}
+
 \item{parser}{The parser used to convert the file into an R object}
+
+\item{verbose}{Prints output if TRUE}
 }
 \value{
-An R object containing the downloaded data. If you use the default parser, then an xts object
+A list containing the downloaded data. If you use the default parser, then an xts object
 is returned.
 }
 \description{

@@ -4,7 +4,8 @@
 \alias{GetData}
 \title{Download data from Bloomberg using the getdata program.}
 \usage{
-GetData(user, pw, key, fields, tickers, parser = GetDataParser)
+GetData(user, pw, key, fields, tickers, sync = TRUE, parser = GetDataParser,
+  verbose = FALSE)
 }
 \arguments{
 \item{user}{The account number assigned by Bloomberg}
@@ -17,11 +18,15 @@ GetData(user, pw, key, fields, tickers, parser = GetDataParser)
 
 \item{tickers}{A vector of Bloomberg tickers to be downloaded, e.g. c('SPX Index', 'IBM US Equity')}
 
+\item{sync}{If TRUE, the call does not return until the response file is available, or if a timeout occurs}
+
 \item{parser}{The parser used to convert the file into an R object}
+
+\item{verbose}{Prints output if TRUE}
 }
 \value{
-An R object containing the downloaded data. If you use the default parser, then a data.frame
-is returned.
+A list containing the downloaded data. If you use the default parser, then a data.frame
+is returned as the response object.
 }
 \description{
 This methods blocks call, until the file is available (which can be several minutes)

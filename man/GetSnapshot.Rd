@@ -4,9 +4,9 @@
 \alias{GetSnapshot}
 \title{Download data from Bloomberg using the getsnap program.}
 \usage{
-GetSnapshot(user, pw, key, tickers, snaptime, delayLimit = 3, sync = FALSE,
+GetSnapshot(user, pw, key, tickers, snaptime, delayLimit = 3, sync = TRUE,
   responseParser = GetSnapshotResponseParser,
-  replyParser = GetSnapshotReplyParser)
+  replyParser = GetSnapshotReplyParser, verbose = FALSE)
 }
 \arguments{
 \item{user}{The account number assigned by Bloomberg}
@@ -24,9 +24,13 @@ NY, LONDON, or TOKYO), e.g. 0930}
 \item{delayLimit}{An integer, representing the maximum time Bloomberg should wait on the next price after
 the snaptime.}
 
+\item{sync}{If TRUE, the call does not return until the response file is available, or if a timeout occurs}
+
 \item{responseParser}{The parser used to convert the response file into an R object}
 
 \item{replyParser}{The parser used to convert the reply file into an R object}
+
+\item{verbose}{Prints output if TRUE}
 }
 \value{
 A list containing the response file, as well as a callback to fetch the reply.
@@ -35,5 +39,6 @@ A list containing the response file, as well as a callback to fetch the reply.
 The program getsnap returns two files: one response file containing some errorcodes and masterdate.
 It can be used to check if the request was OK.
 Some time after the snaptime, the reply file is made available. It contains the actual prices.
+See \code{sync} for
 }
 
