@@ -37,22 +37,25 @@ GetData <- function(user, pw, key,
                            data = tickers)
     
   fileName <- str_sub(tempfile(pattern = "getdata_", tmpdir = "", fileext = ".req"), start = 2)
+  res$requestTime <- Sys.time()
   respFileName <- UploadRequest(con, req, fileName, verbose = verbose)
   
   res$requestFileName <- fileName
   res$replyFileName <- respFileName
   
-  callback <- function(parser = parser, verbose = verbose) {
-    TryGetBdlData(con, respFileName, parser, verbose = verbose)
+  callback <- function(parser. = parser, verbose. = verbose) {
+    TryGetBdlData(con, respFileName, parser., verbose = verbose.)
   }
   
   res$GetReply <- callback
   
   if (sync) {
     response <- DownloadResponse(con, respFileName, parser, verbose = verbose)
+    res$reply <- response
+    res$replyTime <- Sys.time()
     res$success <- !is.null(response)  
   }
-  res$reply <- response
+  
   
   
   return (res)
@@ -100,23 +103,26 @@ GetHistory <- function(user, pw, key,
                            data = tickers)
   
   fileName <- str_sub(tempfile(pattern = "gethist_", tmpdir = "", fileext = ".req"), start = 2)
+  res$requestTime <- Sys.time()
   respFileName <- UploadRequest(con, req, fileName, verbose = verbose)
   
   res$requestFileName <- fileName
   res$replyFileName <- respFileName
 
-  callback <- function(parser = parser, verbose = verbose) {
-    TryGetBdlData(con, respFileName, parser, verbose = verbose)
+  callback <- function(parser. = parser, verbose. = verbose) {
+    TryGetBdlData(con, respFileName, parser., verbose = verbose.)
   }
   
   res$GetReply <- callback
   
   if (sync) {
     response <- DownloadResponse(con, respFileName, parser, verbose = verbose)
-    res$success <- !is.null(response)  
+    res$success <- !is.null(response) 
+    res$replyTime <- Sys.time()
+    res$reply <- response
   }
   
-  res$reply <- response
+  
 
   return (res)
 }
@@ -170,20 +176,23 @@ GetSnapshot <- function(user, pw, key,
                            data = tickers)
   
   fileName <- str_sub(tempfile(pattern = "getsnap_", tmpdir = "", fileext = ".req"), start = 2)
+  res$requestTime <- Sys.time()
   replyFileName <- UploadRequest(con, req, fileName, verbose = verbose)
   
   responseFileName <- paste0(fileName, '.', 'resp')
   
-  callback <- function(responseParser = responseParser, verbose = verbose) {
-    TryGetBdlData(con, responseFileName, responseParser, verbose = verbose)
+  callback <- function(responseParser. = responseParser, verbose. = verbose) {
+    TryGetBdlData(con, responseFileName, responseParser., verbose = verbose.)
   }
   res$GetRespone <- callback
   if (sync) {
     response <- DownloadResponse(con, responseFileName, responseParser, verbose = verbose)
+    res$responseTime <- Sys.time()
+    res$response <- response
   }
   
-  res$response <- response
-  res$responseFileName <- respFileName
+  
+  res$responseFileName <- responseFileName
   res$connection <- con
   res$requestFileName <- fileName
   res$replyFileName <- replyFileName
@@ -198,8 +207,8 @@ GetSnapshot <- function(user, pw, key,
     }
   }
   
-  callback <- function(replyParser = replyParser) {
-    TryGetBdlData(con, replyFileName, replyParser, verbose = verbose)
+  callback <- function(replyParser. = replyParser, verbose. = verbose) {
+    TryGetBdlData(con, replyFileName, replyParser., verbose = verbose.)
   }
   res$GetReply <- callback
   
@@ -212,6 +221,7 @@ GetSnapshot <- function(user, pw, key,
     if (verbose) cat('\r\n')
     reply <- DownloadResponse(con, replyFileName, replyParser, pollFrequencySec = 300, timeoutMin = 120, verbose = verbose)
     res$reply <- reply
+    res$replyTime <- Sys.time()
     res$success <- !is.null(reply)
   }
   
