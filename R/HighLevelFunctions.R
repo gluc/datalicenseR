@@ -184,26 +184,26 @@ GetSnapshot <- function(user, pw, key,
   callback <- function(responseParser. = responseParser, verbose. = verbose) {
     TryGetBdlData(con, responseFileName, responseParser., verbose = verbose.)
   }
-  res$GetRespone <- callback
-  if (sync) {
-    response <- DownloadResponse(con, responseFileName, responseParser, verbose = verbose)
-    res$responseTime <- Sys.time()
-    res$response <- response
-  }
-  
-  
+  res$GetResponse <- callback
+
   res$responseFileName <- responseFileName
   res$connection <- con
   res$requestFileName <- fileName
   res$replyFileName <- replyFileName
-  res$success <- TRUE
-  if (is.null(response)) {
-    res$success <- FALSE
-    warning("Could not download response file!")
-    return (res)
-  } else {
-    if (any(response$ERROR_CODE != 0)) {
-      warning("Bloomberg says: Your snapshot request containes some errors!", immediate. = TRUE)
+  
+  
+  if (sync) {
+    response <- DownloadResponse(con, responseFileName, responseParser, verbose = verbose)
+    res$responseTime <- Sys.time()
+    res$response <- response
+    if (is.null(response)) {
+      res$success <- FALSE
+      warning("Could not download response file!")
+      return (res)
+    } else {
+      if (any(response$ERROR_CODE != 0)) {
+        warning("Bloomberg says: Your snapshot request containes some errors!", immediate. = TRUE)
+      }
     }
   }
   
