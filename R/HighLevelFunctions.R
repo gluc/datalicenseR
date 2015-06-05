@@ -106,6 +106,7 @@ GetSnapshot <- function(user, pw, key,
                         tickers, 
                         snaptime,
                         delayLimit = 3,
+                        sync = FALSE,
                         responseParser = GetSnapshotResponseParser,
                         replyParser = GetSnapshotReplyParser) {
   
@@ -136,12 +137,22 @@ GetSnapshot <- function(user, pw, key,
   callback <- function() {
     TryGetBdlData(con, replyFileName, replyParser)
   }
-  
   res <- list()
+  if (sync) {
+    for (x in 1:as.integer(90)) {
+      cat('.')
+      Sys.sleep(10)
+    }
+    reply <- DownloadResponse(con, replyFileName, replyParser, pollFrequencySec = 300, timeoutMin = 120)
+    res$reply <- reply  
+  }
+  
+  
   res$response <- response
   res$GetReply <- callback
   res$connection <- con
   res$replyFileName <- replyFileName
+  
   return (res)
   
 }
