@@ -3,7 +3,7 @@ context("bdl parse file")
 test_that("BdlParseFile Simple sample1", {
   
   #browser()
-  fileName <- system.file("extdata", "sample1.out", package="datalicenseR")
+  fileName <- system.file("extdata", "getdata.out", package="datalicenseR")
   bdlResponse <- readChar(fileName, file.info(fileName)$size)
   
   bdlResponseDf <- GetDataParser(bdlResponse)

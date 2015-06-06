@@ -18,4 +18,9 @@ a data.frame
 \description{
 Convert Bloomberg out file content to data.frame
 }
+\examples{
+#to look at an example:
+data(getDataReply)
+getDataReply
+}
 

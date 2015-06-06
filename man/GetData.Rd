@@ -4,15 +4,11 @@
 \alias{GetData}
 \title{Download data from Bloomberg using the getdata program.}
 \usage{
-GetData(user, pw, key, fields, tickers, sync = TRUE, parser = GetDataParser,
+GetData(con, fields, tickers, sync = TRUE, parser = GetDataParser,
   verbose = FALSE)
 }
 \arguments{
-\item{user}{The account number assigned by Bloomberg}
-
-\item{pw}{The password of your Bloomberg account}
-
-\item{key}{The DES decryption key of your Bloomberg account}
+\item{con}{The \code{\link{BdlConnection}} object containing the Bloomberg credentials}
 
 \item{fields}{A vector of fields, e.g. c('PX_LAST', 'NAME')}
 
@@ -20,15 +16,75 @@ GetData(user, pw, key, fields, tickers, sync = TRUE, parser = GetDataParser,
 
 \item{sync}{If TRUE, the call does not return until the response file is available, or if a timeout occurs}
 
-\item{parser}{The parser used to convert the file into an R object}
+\item{parser}{The parser used to convert the file into an R object. See \code{\link{GetDataParser}} for details on
+the default parser.}
 
 \item{verbose}{Prints output if TRUE}
 }
 \value{
-A list containing the downloaded data. If you use the default parser, then a data.frame
-is returned as the response object.
+A list containing the downloaded data. If you use the default parser, then a dataframe
+is returned. More precisely, the list contains the following items:
+\describe{
+  \item{\code{connection}}{The \code{\link{BdlConnection}} object used to connect ot Bloomberg (R). This contains the credentials necessary.}
+  \item{\code{requestTime}}{The time at which the request was sent to Bloomberg (R)}
+  \item{\code{requestFileName}}{The name of the file that was uploaded to Bloomberg (R)}
+  \item{\code{replyTime}}{The time at which the reply was downloaded from Bloomberg (R). Applies only if \code{sync == TRUE}}
+  \item{\code{replyFileName}}{The name of the file that was uploaded to Bloomberg (R)}
+  \item{\code{GetReply(parser., verbose.)}}{A callback function to download the reply file. The paramaeters are optional and allow
+  you to overwrite their counterparts given in the \code{GetSnapshot} call.}
+  \item{\code{success}}{\code{TRUE} if the method call was successful. In case of \code{sync == TRUE}, this means that a reply file
+  was successfully downloaded and parsed. Otherwise, it means that the request file was successfully uploaded. }
+}
 }
 \description{
-This methods blocks call, until the file is available (which can be several minutes)
+By default, this methods blocks call, until the file is available (which can be several minutes) (see \code{sync} parameter
+for details)
+}
+\examples{
+\dontrun{
+
+con <- BdlConnection(user = 'dl111111',
+                     pw = 'XvH,gE2A',
+                     key = '3xzZl0yA')
+
+
+#######################
+#Sync call
+
+data <- GetData(con,
+                fields = c('PX_LAST', 'NAME', 'CRNCY'),
+                tickers = c('SPX Index', 'SMI Index', 'IBM US Equity', '120421Q FP Equity'))
+
+#the call blocks, and after 5 minutes or so, you get the reply
+if(data$success) {
+  data$reply
+  #or extract a single value
+  data$reply['SPX Index', 'PX_LAST']
+}
+
+#If your data does not make sense, or you have other problems, you can re-download again using
+#any other parser, and overwriting the verbose parameter:
+cat(data$GetReply(verbose. = TRUE, parser. = function(x) x))
+
+#######################
+#Async call
+
+data <- GetData(con,
+                fields = c('PX_LAST', 'NAME', 'CRNCY'),
+                tickers = c('SPX Index', 'SMI Index', 'IBM US Equity', '120421Q FP Equity'),
+                sync = FALSE)
+
+#the method returns after uploading. 5 minutes later, you can request to download
+#the reply using the callback:
+reply <- data$GetReply()
+if(!is.null(reply)) {
+  #do something with the data
+}
+
+
+}
+}
+\seealso{
+GetHistory, GetSnapshot
 }
 

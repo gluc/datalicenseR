@@ -2,7 +2,7 @@
 % Please edit documentation in R/BdlConnection.R
 \name{BdlConnection}
 \alias{BdlConnection}
-\title{Create an FTP or SFTP connection to Bloomberg Datalicense}
+\title{Create an FTP connection to Bloomberg Datalicense}
 \usage{
 BdlConnection(user, pw, key)
 }
@@ -17,6 +17,12 @@ BdlConnection(user, pw, key)
 an S3 BdlConnection object, used to upload requests and download prices.
 }
 \description{
-Create an FTP or SFTP connection to Bloomberg Datalicense
+Create an FTP connection to Bloomberg Datalicense
+}
+\examples{
+#these are dummy credentials. Replace with the credentials received from Bloomberg
+con <- BdlConnection(user = 'dl111111',
+                     pw = 'XvH,gE2A',
+                     key = '3xzZl0yA')
 }
 

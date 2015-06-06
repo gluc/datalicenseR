@@ -63,24 +63,24 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FAL
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
   iszip <- str_sub(responseFileName, start= -3) == '.gz'
-  if (verbose) print(paste0("downloading ftp ", responseFileName, "..."))
+  if (verbose) cat(paste0("downloading ftp ", responseFileName, "...\r\n"))
   ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
     
-    if (verbose) print("decrypting file...")
+    if (verbose) cat("decrypting file...\r\n")
     
     decFile <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip)
-    if (verbose) print("unzipping...")
+    if (verbose) cat("unzipping...\r\n")
     #decryptedResult <- readChar(decFile, file.info(decFile)$size)
     decryptedResult <- paste0(readLines(decFile), collapse = '\n')
-    if (verbose) print("parsing...")
+    if (verbose) cat("parsing...\r\n")
     res <- parser(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
-    if (verbose) print(paste0("file ", responseFileName, " not yet available"))
+    if (verbose) cat(paste0("file ", responseFileName, " not yet available\r\n"))
     return (NULL)
   } else if(ftpDownloadResult$errorCode == 78) {
-    if (verbose) print(paste0("file ", responseFileName, " not yet available"))
+    if (verbose) cat(paste0("file ", responseFileName, " not yet available\r\n"))
     return (NULL)
   } else {
     stop(paste0(ftpDownloadResult$errorCode, ": ", ftpDownloadResult$errorMsg))
@@ -115,22 +115,22 @@ DownloadResponse <- function(bdlConnection, responseFileName, parser, pollFreque
   while (is.null(res)) {
     res <- TryGetBdlData(bdlConnection, responseFileName, parser, verbose)
     if(is.null(res)) {
-      if (verbose) print('File not yet available, waiting...')
-      if (verbose) print(Sys.time())
+      if (verbose) cat('File not yet available, waiting...\r\n')
+      if (verbose) cat(Sys.time())
       for (x in 1:as.integer(pollFrequencySec / 2)) {
-        if (verbose) cat('.')
+        if (verbose) cat('.\r\n')
         Sys.sleep(2)
       }
       myTime <- myTime + pollFrequencySec
       if (verbose) cat('\r\n')
       if (myTime > timeoutSec) {
-        print(paste0('Timeout! Could not download file ', responseFileName, ' from bloomberg in ', timeoutMin, ' min. Giving up!'))
+        cat(paste0('Timeout! Could not download file ', responseFileName, ' from bloomberg in ', timeoutMin, ' min. Giving up!\r\n'))
         return (NULL)
       }
       
-      if (verbose) print("Checking if file is available...")
+      if (verbose) cat("Checking if file is available...\r\n")
     } else {
-      if (verbose) print('File available! Downloading...')
+      if (verbose) cat('File available! Downloading...\r\n')
     }
   }
   return (res)

@@ -4,6 +4,11 @@
 #' @param columnHeader If TRUE, then column headers are auto detected. If FALSE, then it
 #' is assumed no column headers exist.
 #' @return a data.frame
+#' 
+#' @examples
+#' #to look at an example:
+#' data(getDataReply)
+#' getDataReply
 #'  
 #' @export
 GetDataParser <- function(bdlOutContent, columnHeader = TRUE) {
@@ -77,12 +82,21 @@ ParseBdlField <- function(value, fieldName) {
 }
 
 
-#' Convert Bloomberg out file content to a list of xts objects
+#' Convert Bloomberg gethistory out file content to a list of xts objects
 #' 
 #' @param bdlOutContent The content string
 #' @return A list containing the xts objects
+#' 
+#' 
+#' @examples
+#' #to look at an example:
+#' data(getHistoryListReply)
+#' getHistoryListReply
+#'  
+#' @seealso GetHistoryParser
+#' 
 #' @export
-GetHistoryParserList <- function(bdlOutContent) {
+GetHistoryListParser <- function(bdlOutContent) {
   #decFile <- 'inst/extdata/gethist.out'
   #bdlOutContent <- readChar(decFile, file.info(decFile)$size)
   
@@ -103,10 +117,17 @@ GetHistoryParserList <- function(bdlOutContent) {
 }
 
 
-#' Convert Bloomberg out file content to xts
+#' Convert Bloomberg out file content to a single xts
 #' 
 #' @param bdlOutContent The content string
 #' @return an xts object containing the price series
+#' 
+#' @examples
+#' #to look at an example:
+#' data(getHistoryReply)
+#' getHistoryReply
+#'  
+#' @seealso GetHistoryListParser
 #' @import xts
 #' @export
 GetHistoryParser <- function(bdlOutContent) {
@@ -194,6 +215,11 @@ ParseGetHistoryCol <- function(col, idx, tickerInColName = TRUE) {
 #' The Response file can be used to check if there are any exceptions.
 #' It does not contain the actual price data.
 #' 
+#' @examples
+#' #to look at an example:
+#' data(getSnapshotResponse)
+#' getSnapshotResponse
+#' 
 #' @param bdlOutContent The content string
 #' @return a data frame object containing the price series
 #' @export
@@ -204,6 +230,12 @@ GetSnapshotResponseParser <- function(bdlOutContent) {
 
 
 #' Convert Bloomberg out file content to data.frame
+#' 
+#' @examples
+#' #to look at an example:
+#' data(getSnapshotReply)
+#' getSnapshotReply
+#' 
 #' 
 #' @param bdlOutContent The content string
 #' @return an data frame object containing the price series
