@@ -1,9 +1,15 @@
-#' Create an FTP or SFTP connection to Bloomberg Datalicense
+#' Create an FTP connection to Bloomberg Datalicense
 #' 
 #' 
 #' @param user The account number assigned by Bloomberg
 #' @param pw The password of your Bloomberg account
 #' @param key The DES decryption key of your Bloomberg account
+#' 
+#' @examples
+#' #these are dummy credentials. Replace with the credentials received from Bloomberg 
+#' con <- BdlConnection(user = 'dl111111', 
+#'                      pw = 'XvH,gE2A', 
+#'                      key = '3xzZl0yA')
 #' 
 #' @return an S3 BdlConnection object, used to upload requests and download prices.
 #' @export
@@ -31,6 +37,8 @@ BdlConnection <- function(user,
     bdlConnection <- list();
     bdlConnection$connectionString <- connectionString
     bdlConnection$key <- key
+    bdlConnection$pw <- pw
+    bdlConnection$user <- user
     
     class(bdlConnection) <- append(class(bdlConnection),"BdlConnection")
     
@@ -60,9 +68,11 @@ UploadRequest <- function(bdlConnection, bdlRequest, targetFileName, responseFil
   if (!(is.null(responseFileName) || inherits(targetFileName,"character"))) stop("targetFileName must be of class character")
   
   request <- as.character(bdlRequest)
+  if (verbose) cat(paste0("Uploading file ", targetFileName, "...\r\n" ))
   UploadFTP(request, bdlConnection$connectionString, targetFileName)
   responseFileName <- DeriveResponseFileName(bdlRequest, targetFileName, responseFileName)
   DeleteFTPFile(bdlConnection$connectionString, responseFileName)
+  if (verbose) cat(paste0("Successfully uploaded file ", targetFileName, ".\r\n" ))
   return (responseFileName)
 }
 

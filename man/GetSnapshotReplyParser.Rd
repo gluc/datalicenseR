@@ -15,4 +15,9 @@ an data frame object containing the price series
 \description{
 Convert Bloomberg out file content to data.frame
 }
+\examples{
+#to look at an example:
+data(getSnapshotReply)
+getSnapshotReply
+}
 

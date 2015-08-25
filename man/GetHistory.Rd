@@ -4,15 +4,11 @@
 \alias{GetHistory}
 \title{Download data from Bloomberg using the gethistory program.}
 \usage{
-GetHistory(user, pw, key, fields, tickers, fromDate, toDate = Sys.Date(),
-  parser = GetHistoryParser)
+GetHistory(con, fields, tickers, fromDate, toDate = Sys.Date(), sync = TRUE,
+  parser = GetHistoryParser, verbose = FALSE)
 }
 \arguments{
-\item{user}{The account number assigned by Bloomberg}
-
-\item{pw}{The password of your Bloomberg account}
-
-\item{key}{The DES decryption key of your Bloomberg account}
+\item{con}{The \code{\link{BdlConnection}} object containing the Bloomberg credentials}
 
 \item{fields}{A vector of fields, e.g. c('PX_LAST', 'NAME')}
 
@@ -20,15 +16,79 @@ GetHistory(user, pw, key, fields, tickers, fromDate, toDate = Sys.Date(),
 
 \item{fromDate}{The start date in your request}
 
-\item{toDate}{The end date in your request}
+\item{toDate}{The end date in your request. Per default, this is today.}
 
-\item{parser}{The parser used to convert the file into an R object}
+\item{sync}{If TRUE, then the call will not return until the file is available, or until it times out}
+
+\item{parser}{The parser used to convert the file into an R object. The default parser is the \code{\link{GetHistoryParser}}.
+Another parser you might prefer is the \code{\link{GetHistoryListParser}}.}
+
+\item{verbose}{Prints output if TRUE}
 }
 \value{
-An R object containing the downloaded data. If you use the default parser, then an xts object
-is returned.
+A list containing the downloaded data. If you use the default parser, then an xts object
+is returned. More precisely, the list contains the following items:
+\describe{
+  \item{\code{connection}}{The \code{\link{BdlConnection}} object used to connect ot Bloomberg (R). This contains the credentials necessary.}
+  \item{\code{requestTime}}{The time at which the request was sent to Bloomberg (R)}
+  \item{\code{requestFileName}}{The name of the file that was uploaded to Bloomberg (R)}
+  \item{\code{replyTime}}{The time at which the reply was downloaded from Bloomberg (R). Applies only if \code{sync == TRUE}}
+  \item{\code{replyFileName}}{The name of the file that was uploaded to Bloomberg (R)}
+  \item{\code{GetReply(parser., verbose.)}}{A callback function to download the reply file. The paramaeters are optional and allow
+  you to overwrite their counterparts given in the \code{GetSnapshot} call.}
+  \item{\code{success}}{\code{TRUE} if the method call was successful. In case of \code{sync == TRUE}, this means that a reply file
+  was successfully downloaded and parsed. Otherwise, it means that the request file was successfully uploaded. }
+}
 }
 \description{
-This methods blocks call, until the file is available (which can be several minutes)
+By default, this methods blocks call, until the file is available (which can be several minutes) (see \code{sync} parameter
+for details)
+}
+\examples{
+\dontrun{
+
+con <- BdlConnection(user = 'dl111111',
+                     pw = 'XvH,gE2A',
+                     key = '3xzZl0yA')
+
+
+#######################
+#Sync call
+
+history <- GetHistory(con,
+                      fields = c('PX_OPEN', 'PX_HIGH', 'PX_LOW'),
+                      tickers = c('SPX Index', 'SMI Index', 'IBM US Equity', '120421Q FP Equity'),
+                      fromDate = "2015-05-01", toDate = "2015-05-08",
+                      verbose = TRUE)
+
+#the call blocks, and after 5 minutes or so, you get the reply
+if(history$success) {
+  history$reply
+  #or extract single column:
+  history$reply$SPX_Index.PX_HIGH
+}
+
+#######################
+#Async call
+
+history <- GetHistory(con,
+                      fields = c('PX_OPEN', 'PX_HIGH', 'PX_LOW'),
+                      tickers = c('SPX Index', 'SMI Index', 'IBM US Equity', '120421Q FP Equity'),
+                      fromDate = "2015-05-01", toDate = "2015-05-08",
+                      sync = FALSE,
+                      verbose = TRUE)
+
+#the method returns after uploading. 5 minutes later, you can request to download
+#the reply using the callback:
+reply <- history$GetReply()
+if(!is.null(reply)) {
+  #do something with the data
+}
+
+
+}
+}
+\seealso{
+GetData, GetSnapshot
 }
 

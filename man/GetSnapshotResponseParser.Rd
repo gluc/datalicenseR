@@ -16,4 +16,9 @@ a data frame object containing the price series
 The Response file can be used to check if there are any exceptions.
 It does not contain the actual price data.
 }
+\examples{
+#to look at an example:
+data(getSnapshotResponse)
+getSnapshotResponse
+}
 
