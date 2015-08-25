@@ -4,12 +4,12 @@ Title: Bloomberg Datalicense Market Data Download
 Version: 0.1.0
 Date: 2015-05-21
 Author: Christoph Glur
-Maintainer: Christoph Glur <christoph.glur@ipub.ch>
+Maintainer: Christoph Glur <christoph.glur@ipub.com>
 VignetteBuilder: knitr
 Imports:
     RCurl, stringr, libdes, xts
 Suggests:
-    testthat, knitr
+    testthat, knitr, rmarkdown
 Description: Download prices, market data, and master data with the 
     Bloomberg Datalicense service. As a prerequisite, you need a valid
     license from Bloomberg. This software and its author are in no way 

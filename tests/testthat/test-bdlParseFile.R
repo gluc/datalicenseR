@@ -46,6 +46,36 @@ test_that("GetHistoryParser Multi", {
 })
 
 
+test_that("GetHistoryParser Multi Error", {
+  
+  
+  fileName <- system.file("extdata", "historyReply2.out", package="datalicenseR")
+  bdlResponse <- readChar(fileName, file.info(fileName)$size)
+  
+  bdlResponseXts <- GetHistoryParser(bdlResponse)
+  
+  ers <- attr(bdlResponseXts, "error")
+  expect_equal(ers, list(GX1_A_00_0_R.Index.PX_OPEN = "10", 
+                         GX1_A_00_0_R.Index.PX_LAST = "10"))
+  
+})
+
+
+
+
+test_that("GetHistoryParserList Multi ERROR", {
+  
+  
+  fileName <- system.file("extdata", "historyReply2.out", package="datalicenseR")
+  bdlResponse <- readChar(fileName, file.info(fileName)$size)
+  
+  bdlResponse <- GetHistoryListParser(bdlResponse)
+  expect_equal(attr(bdlResponse[[1]], "errors"), list(PX_OPEN = "10", PX_LAST = "10"))
+  expect_true(is.null(attr(bdlResponse[[2]], "errors")))
+  
+  
+})
+
 
 
 test_that("GetHistoryParserList Multi", {
@@ -54,10 +84,10 @@ test_that("GetHistoryParserList Multi", {
   fileName <- system.file("extdata", "historyReply1.out", package="datalicenseR")
   bdlResponse <- readChar(fileName, file.info(fileName)$size)
   
-  bdlResponse <- GetHistoryParserList(bdlResponse)
+  bdlResponse <- GetHistoryListParser(bdlResponse)
   expect_equal(class(bdlResponse), 'list')
   expect_equal(length(bdlResponse), 2)
-
+  
   expect_equal(names(bdlResponse), c('GX1 A:00_0_R Index', 'VG1 A:00_0_R Index'))
   
   for (i in 1:2) {

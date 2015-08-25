@@ -108,12 +108,15 @@ GetHistoryListParser <- function(bdlOutContent) {
     res <- xts(order.by = idx )
     parseRes <- ParseGetHistoryCol(col, idx, FALSE)
     res <- merge(res, parseRes)
+    attr(res, "errors") <- c(attr(res, "errors"), attr(parseRes, "errors"))
     ticker <- attr(parseRes, 'ticker')
     if (ticker %in% names(resultList)) {
       resultList[[ticker]] <- merge(resultList[[ticker]], res)
+      attr(resultList[[ticker]], "errors") <- c(attr(resultList[[ticker]], "errors"), attr(parseRes, "errors"))
     } else {
       resultList[[ticker]] <- res
     }
+    
   }
   
   return (resultList)
@@ -143,9 +146,11 @@ GetHistoryParser <- function(bdlOutContent) {
   idx <- ParseGetHistoryIndex(bdlOutContent)
   
   res <- xts(order.by = idx )
-  
+  attr(res, "errors") <- list()
   for (col in cols[-1]) {
-    res <- merge(res, ParseGetHistoryCol(col, idx))
+    parseRes <- ParseGetHistoryCol(col, idx)
+    res <- merge(res, parseRes)
+    if (!is.null(attr(parseRes, "errors"))) attr(res, "errors")[[tail(names(res), 1)]] <- as.character(attr(parseRes, "errors"))
   }
   
   return (res)
@@ -193,6 +198,8 @@ ParseGetHistoryCol <- function(col, idx, tickerInColName = TRUE) {
   
   ticker <- rows[2]
   field <- rows[3]
+  errorCode <- rows[length(rows)-1]
+  
   if(tickerInColName) {
     colName <- str_replace( paste0(ticker, '.', field), " ", "_")
   } else {
@@ -210,6 +217,14 @@ ParseGetHistoryCol <- function(col, idx, tickerInColName = TRUE) {
   }
   colnames(res) <- c(colName)  
   attr(res, 'ticker') <- ticker
+  
+  if (errorCode != 0) {
+    if (is.null(attr(res, 'errors'))) {
+      attr(res, 'errors') <- list()
+    }
+    attr(res, 'errors')[[field]] <- errorCode
+  }
+  
   return (res)
 }
 
