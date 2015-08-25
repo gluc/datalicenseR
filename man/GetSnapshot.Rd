@@ -4,36 +4,120 @@
 \alias{GetSnapshot}
 \title{Download data from Bloomberg using the getsnap program.}
 \usage{
-GetSnapshot(user, pw, key, tickers, snaptime, delayLimit = 3, sync = FALSE,
+GetSnapshot(con, tickers, snaptime, delayLimit = 3, sync = TRUE,
   responseParser = GetSnapshotResponseParser,
-  replyParser = GetSnapshotReplyParser)
+  replyParser = GetSnapshotReplyParser, timeoutMin = 120, verbose = FALSE)
 }
 \arguments{
-\item{user}{The account number assigned by Bloomberg}
-
-\item{pw}{The password of your Bloomberg account}
-
-\item{key}{The DES decryption key of your Bloomberg account}
+\item{con}{The \code{\link{BdlConnection}} object containing the Bloomberg credentials}
 
 \item{tickers}{A vector of Bloomberg tickers to be downloaded, e.g. c('SPX Index', 'IBM US Equity')}
 
 \item{snaptime}{A character string, containing the snapshot time, in the format HHMM, and only
-half-hours are allowed. Also, the timezone of the snapshot is your Bloomberg region (either
+half-hours are allowed (e.g. 0900 or 0930, but not 0915). Also, the timezone of the snapshot is your Bloomberg region (either
 NY, LONDON, or TOKYO), e.g. 0930}
 
 \item{delayLimit}{An integer, representing the maximum time Bloomberg should wait on the next price after
-the snaptime.}
+the snaptime. This is useful if you have delayed prices on some of the markets requested.}
+
+\item{sync}{If TRUE, the call does not return until the response file is available, or if a timeout occurs}
 
 \item{responseParser}{The parser used to convert the response file into an R object}
 
 \item{replyParser}{The parser used to convert the reply file into an R object}
+
+\item{timeoutMin}{The timeout of the replyFile. This only applies if \code{sync == TRUE}.}
+
+\item{verbose}{Prints output if TRUE}
 }
 \value{
-A list containing the response file, as well as a callback to fetch the reply.
+A list containing the response file, as well as a callback to fetch the reply. More precisely, the list contains
+the following items:
+\describe{
+  \item{\code{connection}}{The \code{\link{BdlConnection}} object used to connect ot Bloomberg (R). This contains the credentials necessary.}
+  \item{\code{requestTime}}{The time at which the request was sent to Bloomberg (R)}
+  \item{\code{requestFileName}}{The name of the file that was uploaded to Bloomberg (R)}
+  \item{\code{responseTime}}{The time at which the response file was downloaded from Bloomberg (R). Applies only if \code{sync == TRUE}}
+  \item{\code{responseFileName}}{The name of the response file containing the error codes.}
+  \item{\code{GetResponse(responseParser., verbose.)}}{A callback function to download the response file. The paramaeters are optional and allow
+  you to overwrite their counterparts given in the \code{GetSnapshot} call.}
+  \item{\code{replyTime}}{The time at which the reply was downloaded from Bloomberg (R). Applies only if \code{sync == TRUE}}
+  \item{\code{replyFileName}}{The name of the file that was uploaded to Bloomberg (R)}
+  \item{\code{GetReply(replyParser., verbose.)}}{A callback function to download the reply file. The paramaeters are optional and allow
+  you to overwrite their counterparts given in the \code{GetSnapshot} call.}
+  \item{\code{success}}{\code{TRUE} if the method call was successful. In case of \code{sync == TRUE}, this means that a reply file
+  was successfully downloaded and parsed. Otherwise, it means that the request file was successfully uploaded. }
+
+}
 }
 \description{
 The program getsnap returns two files: one response file containing some errorcodes and masterdate.
 It can be used to check if the request was OK.
 Some time after the snaptime, the reply file is made available. It contains the actual prices.
+By default, this methods blocks call, until the file is available (which can be several hours, depending on your \code{snaptime}) (see \code{sync} parameter
+for details)
+}
+\examples{
+\dontrun{
+
+con <- BdlConnection(user = 'dl111111',
+                     pw = 'XvH,gE2A',
+                     key = '3xzZl0yA')
+
+#######################
+# Sync call
+
+#this blocks, and waits until the files are available, or until a timeout occurs.
+#Remember that the snaptime is in the timezone of your Bloomberg region (London, NY, Tokyo),
+#and that only full and have hours are allowed (e.g. 0900 or 0930)
+snapshot <- GetSnapshot(con,
+                        tickers = c('SPX Index', 'SMI Index'),
+                        snaptime = "0930",
+                        delayLimit = 15,
+                        sync = TRUE)
+
+#after long time waiting
+if(snapshot$success) {
+  snapshot$reply
+  reply['SPX Index', 'OPEN_PRICE']
+}
+
+#You can re-download both the reply and the response file:
+snapshot$GetResponse()
+
+if you have problems with the download, you can overwrite the verbose parameter:
+snapshot$GetResponse(verbose. = TRUE)
+
+#or you might use a different parser, to see the file in raw text:
+cat(snapshot$GetResponse(responseParser. = function(x) x))
+
+
+#######################
+#Async call
+
+#this returns immediately after uploading the request. You
+#can then use the callback handles for downloading the results.
+snapshot <- GetSnapshot(con,
+                        tickers = c('SPX Index', 'SMI Index'),
+                        snaptime = "0930",
+                        delayLimit = 15)
+
+#after 3 minutes or so, you can check if your request was ok:
+response <- snapshot$GetResponse()
+
+#check if there were any errors in the response:
+any(response$ERROR_CODE != 0)
+
+#get the error message to identify the problem:
+GetSnapshotErrorMessage(response$ERROR_CODE)
+
+#when you expect the reply to be available:
+reply <- snapshot$GetReply()
+if(!is.null(reply)) reply['SPX Index', 'OPEN_PRICE']
+
+}
+}
+\seealso{
+GetData, GetHistory
 }
 

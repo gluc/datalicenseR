@@ -2,7 +2,7 @@
 % Please edit documentation in R/Parser.R
 \name{GetHistoryParser}
 \alias{GetHistoryParser}
-\title{Convert Bloomberg out file content to xts}
+\title{Convert Bloomberg out file content to a single xts}
 \usage{
 GetHistoryParser(bdlOutContent)
 }
@@ -13,6 +13,14 @@ GetHistoryParser(bdlOutContent)
 an xts object containing the price series
 }
 \description{
-Convert Bloomberg out file content to xts
+Convert Bloomberg out file content to a single xts
+}
+\examples{
+#to look at an example:
+data(getHistoryReply)
+getHistoryReply
+}
+\seealso{
+GetHistoryListParser
 }
 
