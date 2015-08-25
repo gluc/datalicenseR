@@ -95,7 +95,11 @@ GetHistoryParserList <- function(bdlOutContent) {
     parseRes <- ParseGetHistoryCol(col, idx, FALSE)
     res <- merge(res, parseRes)
     ticker <- attr(parseRes, 'ticker')
-    resultList[[ticker]] <- res
+    if (ticker %in% names(resultList)) {
+      resultList[[ticker]] <- merge(resultList[[ticker]], res)
+    } else {
+      resultList[[ticker]] <- res
+    }
   }
   
   return (resultList)
