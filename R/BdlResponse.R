@@ -60,20 +60,21 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
 #' @seealso BdlResponseHandle
 #' @export
 TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FALSE) {
+  
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
   iszip <- str_sub(responseFileName, start= -3) == '.gz'
   if (verbose) cat(paste0("downloading ftp ", responseFileName, "...\r\n"))
-  ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
+  ftpDownloadResult <- datalicenseR:::DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
-    
+    if (verbose) cat(paste0("downloaded file of size ", file.info(ftpDownloadResult$content)$size, "...\r\n"))
     if (verbose) cat("decrypting file...\r\n")
-    
-    decFile <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip)
-    if (verbose) cat("unzipping...\r\n")
+    decFile <- datalicenseR:::DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip)
+    if (verbose) cat(paste0("unzipping decrypted file of size ", file.info(decFile)$size, "...\r\n"))
     #decryptedResult <- readChar(decFile, file.info(decFile)$size)
-    decryptedResult <- paste0(readLines(decFile), collapse = '\n')
-    if (verbose) cat("parsing...\r\n")
+    lns <- readLines(decFile)
+    decryptedResult <- paste0(lns, collapse = '\n')
+    if (verbose) cat(paste0("parsing ", length(lns), " lines...\r\n"))
     res <- parser(decryptedResult)
     return (res)
   } else if(ftpDownloadResult$errorCode == "REMOTE_FILE_NOT_FOUND") {
@@ -86,6 +87,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FAL
     stop(paste0(ftpDownloadResult$errorCode, ": ", ftpDownloadResult$errorMsg))
   }
 }
+
 
 
 #' Download the data in sync mode, waiting until the result file is there
