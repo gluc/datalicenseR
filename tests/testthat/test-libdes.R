@@ -62,7 +62,7 @@ test_that("roundtrip wrapper", {
 
 test_that("roundtrip long", {
   
-  TestDES(numChars = 500000)
+  TestDES(UUENC = TRUE, numChars = 10000000)
   
 })
 

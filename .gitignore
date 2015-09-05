@@ -14,3 +14,9 @@ vignettes/*.pdf
 .Rproj.user
 
 private/*
+
+src/*.a
+src/*.o
+src/*.so
+src/*.dll
+src/*.exe
