@@ -10,6 +10,7 @@
 #' @param UUENC Whether to use UU Encoding
 #' @param uuencFileName The original file name to add as a header to the Uuencoded file
 #'
+#'
 #' @export
 EncryptFile <- function(sourceFile, encryptedFile, key, SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, uuencFileName = "") {
   

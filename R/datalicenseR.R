@@ -9,6 +9,7 @@
 #' }
 #' 
 #' @import RCurl
+#' @useDynLib datalicenseR
 #' @seealso For more details and lower level functions, see the \code{datalicenseR} vignette by running: \code{vignette("datalicenseR")}
 #' @docType package
 #' @name datalicenseR

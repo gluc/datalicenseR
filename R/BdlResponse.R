@@ -1,5 +1,5 @@
 library(stringr)
-library(libdes)
+
 
 #' Derives the expected response file name
 #'  
@@ -139,7 +139,6 @@ DownloadResponse <- function(bdlConnection, responseFileName, parser, pollFreque
 }
 
 
-#' @import libdes
 DecryptBdlResponse <- function(fileName, key, iszip) {
   decFile <- paste0(fileName, '.dec')
   if (iszip) {

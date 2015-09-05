@@ -1,10 +1,10 @@
-TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, uuencFile = "", numChars = 100) {
+TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, uuencFile = "", numChars = 100, lines = 10) {
   
   #create a temporary file
   fileIn <- tempfile()
   #Write something into it
-  fileContent <- RandomString(length = numChars)
-  cat(fileContent, file = fileIn)
+  fileContent <- RandomString(n = lines, length = numChars)
+  writeLines(fileContent, fileIn)
   
   
   #name of the target encrypted file
@@ -31,7 +31,7 @@ TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, 
   result <- DecryptFile(fileEnc, fileDec, key, SUNOS, HEX_KEY, ECB, UUENC)
   
   #read in decrypted file
-  decryptedString <- readChar(fileDec, file.info(fileDec)$size)
+  decryptedString <- readLines(fileDec, file.info(fileDec)$size)
   
   #check that content is the same
   expect_equal(fileContent, decryptedString)
@@ -44,7 +44,7 @@ RandomString <- function(n = 1, length = 12) {
   randomString <- c(1:n)                  
   for (i in 1:n)
   {
-    randomString[i] <- paste(sample(c(0:9, letters, LETTERS, " ", "|", "\r\n"),
+    randomString[i] <- paste(sample(c(0:9, letters, LETTERS, " ", "|", ":"),
                                     length, replace=TRUE),
                              collapse="")
   }
