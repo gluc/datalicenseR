@@ -1,0 +1,90 @@
+---
+title: "datalicenseR"
+author: "Christoph Glur"
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    self_contained: yes
+    theme: cerulean
+    toc: yes
+    toc_depth: 3
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+---
+
+<!--
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{datalicenseR}
+-->
+
+
+# Introduction
+
+datalicenseR lets you download data from Bloomberg Datalicense service.
+
+# Full Workflow
+
+A standard workflow could look like this:
+
+```{r eval=FALSE}
+library(datalicenseR)
+#there is no bloomberg-test, unfortunately. So use your assigned credentials and ftp server instead.
+bdlConnection <- BdlConnection(user = 'dl1234', pw = 'xyz123', 'bfmrr.bloomberg-test.com') 
+
+#refer to the Bloomberg documentation for details
+bdlRequest <- BdlRequestBuilder(
+                  header = c(FIRMNAME = 'dl1234', PROGRAMNAME = 'getdata', PROGRAMFLAG = 'oneshot'),
+                  fields = c('PX_LAST', 'PX_CLOSE'), 
+                  data = c('IBM US Equity', "INDU Index"))
+
+#derive out name from request file name
+responseFileName <- UploadRequest(bdlConnection,
+                                  bdlRequest, 
+                                  'test.req')
+
+repeat {
+  res <- TryGetBdlData(bdlConnection, responseFileName)
+  if (!is.null(res)) break
+  Sys.sleep(5)
+}
+
+
+```
+
+The resulting data.frame then looks like this:
+
+```{r echo=FALSE}
+library(datalicenseR)
+data(getDataReply)
+res <- getDataReply
+```
+
+```{r}
+res
+```
+
+
+However, the various steps involved are also available as such, as the following sections show.
+
+# Upload a ready-made request file, without the Builder
+
+```{r eval=FALSE}
+fileName <- "inst/extdata/getdata.req"
+request <- readChar(fileName, file.info(fileName)$size)
+# The bdlRequest arg can be either a BdlRequestBuilder object, or - as is the
+# case here - a character string. 
+responseFileName <- UploadRequest(bdlConnection = bdlConnection, 
+                                  bdlRequest = request, 
+                                  targetFileName = 'test.req')
+```
+
+# Parse Bloomberg Response File, previously downloaded
+
+
+```{r eval=TRUE}
+fileName <- system.file("extdata", "getdata.out", package="datalicenseR")
+content <- readChar(fileName, file.info(fileName)$size)
+response1 <- GetDataParser(bdlOutContent = content)
+```
+

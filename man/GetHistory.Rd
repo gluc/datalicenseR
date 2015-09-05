@@ -68,6 +68,18 @@ if(history$success) {
   history$reply$SPX_Index.PX_HIGH
 }
 
+#To see the downloaded file content:
+cat(history$response)
+
+#Or, if you prefer a list with one xts object per security:
+history <- GetHistory(con,
+                      fields = c('PX_OPEN', 'PX_HIGH', 'PX_LOW'),
+                      tickers = c('SPX Index', 'SMI Index', 'IBM US Equity', '120421Q FP Equity'),
+                      fromDate = "2015-05-01", toDate = "2015-05-08",
+                      parser = GetHistoryListParser,
+                      verbose = TRUE)
+
+
 #######################
 #Async call
 
@@ -85,6 +97,13 @@ if(!is.null(reply)) {
   #do something with the data
 }
 
+
+
+
+######################
+#Re-download an existing file
+
+TryGetBdlData(con, history$replyFileName)
 
 }
 }

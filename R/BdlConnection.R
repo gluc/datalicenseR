@@ -208,6 +208,16 @@ DownloadFTP <- function(baseURL, filePath, delete = FALSE) {
 }
 
 
+DownloadFTP_3 <- function(baseURL, filePath, delete = FALSE) {
+  #with curl
+  destFile <- tempfile()
+  url <- paste(baseURL, filePath, sep = '/')
+  h <- new_handle()
+  handle_setopt(h, .list = list(postquote = paste0("DELE ", "/", filePath)))
+  res <- curl_download(url, destFile, mode = "w", handle = h)
+}
+
+
 DeleteFTPFile <- function(baseURL, filePath) {
   
   #see here for libcurl options: http://stackoverflow.com/questions/17119449/rcurl-boolean-options

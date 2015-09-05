@@ -27,8 +27,7 @@
 #' 
 #' @examples
 #' \dontrun{
-#' 
-#' con <- BdlConnection(user = 'dl111111', 
+#' #' con <- BdlConnection(user = 'dl111111', 
 #'                      pw = 'XvH,gE2A', 
 #'                      key = '3xzZl0yA')
 #' 
@@ -208,6 +207,7 @@ GetData <- function(con,
 #' 
 #' TryGetBdlData(con, history$replyFileName)
 #' 
+#' }
 #' 
 #' @seealso GetData, GetSnapshot
 #' @import stringr

@@ -42,8 +42,7 @@ for details)
 }
 \examples{
 \dontrun{
-
-con <- BdlConnection(user = 'dl111111',
+#' con <- BdlConnection(user = 'dl111111',
                      pw = 'XvH,gE2A',
                      key = '3xzZl0yA')
 
