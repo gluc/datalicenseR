@@ -145,7 +145,12 @@ DecryptBdlResponse <- function(fileName, key, iszip) {
     decFile <- paste0(decFile, '.gz')
   }
   if(file.exists(decFile)) file.remove(decFile) #should not happen, is temp file
-  DecryptFile(fileName, decFile, key, UUENC = TRUE)
+  #DecryptFile(fileName, decFile, key, UUENC = TRUE)
+  
+  cnt <- readChar(fileName, file.info(fileEnc)$size)
+  decryptedString <- Decrypt(cnt, key = key)
+  writeChar(decryptedString, con = decFile)
+  
   return (decFile)
 }
 
