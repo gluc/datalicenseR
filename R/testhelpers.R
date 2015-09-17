@@ -21,7 +21,7 @@ TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, 
                         HEX_KEY = HEX_KEY, 
                         ECB = ECB, 
                         UUENC = UUENC,
-                        uuencFile = uuencFile)
+                        uuencFile = fileIn)
   
   # now decrypt
   

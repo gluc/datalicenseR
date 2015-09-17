@@ -7,13 +7,20 @@ context("des")
 
 test_that("roundtrip wrapper", {
   
-  datalicenseR:::TestDES()
+  TestDES()
 
 })
 
-test_that("roundtrip long", {
+test_that("roundtrip long UUENC", {
   
   TestDES(UUENC = TRUE, numChars = 100000, lines = 100)
+  
+})
+
+
+test_that("roundtrip long", {
+  
+  TestDES(UUENC = FALSE, numChars = 100000, lines = 100)
   
 })
 

@@ -68,8 +68,8 @@ PERL=	des.pl testdes.pl doIP doIP2 doPC1 doPC2 PC1 PC2 shifts.pl
 
 ALL=	$(GENERAL) $(DES) $(TESTING) $(LIBDES) $(PERL) $(HEADERS)
 
-DLIB=	libdes.a
-DSLIB=	libdes.so
+DLIB=	datalicenseR.a
+DSLIB=	datalicenseR.so
 
 # destest rpw des speed des_opts
 all: $(DLIB) $(DSLIB)
