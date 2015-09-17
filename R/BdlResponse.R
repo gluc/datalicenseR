@@ -65,11 +65,11 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FAL
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
   iszip <- str_sub(responseFileName, start= -3) == '.gz'
   if (verbose) cat(paste0("downloading ftp ", responseFileName, "...\r\n"))
-  ftpDownloadResult <- datalicenseR:::DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
+  ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName, delete = FALSE)
   if(ftpDownloadResult$success) {
     if (verbose) cat(paste0("downloaded file of size ", file.info(ftpDownloadResult$content)$size, "...\r\n"))
     if (verbose) cat("decrypting file...\r\n")
-    decFile <- datalicenseR:::DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip)
+    decFile <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip)
     if (verbose) cat(paste0("unzipping decrypted file of size ", file.info(decFile)$size, "...\r\n"))
     #decryptedResult <- readChar(decFile, file.info(decFile)$size)
     lns <- readLines(decFile)
@@ -145,11 +145,7 @@ DecryptBdlResponse <- function(fileName, key, iszip) {
     decFile <- paste0(decFile, '.gz')
   }
   if(file.exists(decFile)) file.remove(decFile) #should not happen, is temp file
-  #DecryptFile(fileName, decFile, key, UUENC = TRUE)
-  
-  cnt <- readChar(fileName, file.info(fileEnc)$size)
-  decryptedString <- Decrypt(cnt, key = key)
-  writeChar(decryptedString, con = decFile)
+  DecryptFile(fileName, decFile, key, UUENC = TRUE)
   
   return (decFile)
 }

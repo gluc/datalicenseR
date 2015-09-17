@@ -1,5 +1,4 @@
 TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, uuencFile = "", numChars = 100, lines = 10) {
-  browser()
   #create a temporary file
   fileIn <- tempfile()
   #Write something into it
@@ -28,13 +27,13 @@ TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, 
   fileDec <- paste0(fileIn, ".dec")
   
   
-  #result <- DecryptFile(fileEnc, fileDec, key, SUNOS, HEX_KEY, ECB, UUENC)
+  result <- DecryptFile(fileEnc, fileDec, key, SUNOS, HEX_KEY, ECB, UUENC)
   #read in decrypted file
-  #decryptedString <- readLines(fileDec, file.info(fileDec)$size)
+  decryptedString <- readLines(fileDec, file.info(fileDec)$size)
   
-  cnt <- readChar(fileEnc, file.info(fileEnc)$size)
+  #cnt <- readChar(fileEnc, file.info(fileEnc)$size)
   
-  decryptedString <- Decrypt(cnt, key = key)
+  #decryptedString <- Decrypt(cnt, key = key)
   
   
   

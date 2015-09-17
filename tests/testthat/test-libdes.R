@@ -13,32 +13,25 @@ test_that("roundtrip wrapper", {
 
 test_that("roundtrip long UUENC", {
   
-  #library(testthat)
-  #datalicenseR:::TestDES(UUENC = TRUE, numChars = 49134, lines = 1)
-  #datalicenseR:::TestDES(UUENC = TRUE, numChars = 49134/2, lines = 2)
-  #datalicenseR:::TestDES(UUENC = TRUE, numChars = 49128/4, lines = 4)
-  #datalicenseR:::TestDES(UUENC = TRUE, numChars = 49135, lines = 1)
-  #datalicenseR:::RandomString(n = 1, length = 5000)
-  datalicenseR:::TestDES(UUENC = TRUE, numChars = 49134, lines = 1)
-  datalicenseR:::TestDES(UUENC = TRUE, numChars = 49135, lines = 1)
-  datalicenseR:::TestDES(UUENC = TRUE, uuencFile = "Testy", numChars = 49135, lines = 1)
+  TestDES(UUENC = TRUE, numChars = 49134, lines = 1)
+  
+})
+
+
+test_that("roundtrip longer UUENC", {
+  
+  TestDES(UUENC = TRUE, numChars = 49135, lines = 1)  
   
 })
 
 
 test_that("roundtrip long", {
   
-  TestDES(UUENC = FALSE, numChars = 100000, lines = 100)
+  TestDES(UUENC = FALSE, numChars = 49135, lines = 1)
   
 })
 
 
-
-test_that("roundtrip wrapper SUNO", {
-  
-  TestDES(SUNOS = TRUE)
-  
-})
 
 
 test_that("roundtrip wrapper ECB", {
