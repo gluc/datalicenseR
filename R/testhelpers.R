@@ -1,8 +1,8 @@
-TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, uuencFile = "", numChars = 100, lines = 10) {
-  #create a temporary file
+
+DESRounttrip <- function(fileContent, SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, uuencFile = "") {
   fileIn <- tempfile()
   #Write something into it
-  fileContent <- RandomString(n = lines, length = numChars)
+  
   writeLines(fileContent, fileIn)
   
   
@@ -29,16 +29,25 @@ TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, 
   
   result <- DecryptFile(fileEnc, fileDec, key, SUNOS, HEX_KEY, ECB, UUENC)
   #read in decrypted file
-  decryptedString <- readLines(fileDec, file.info(fileDec)$size)
+  #decryptedString <- readChar(fileDec, file.info(fileDec)$size)
+  
+  decryptedString <- readLines(fileDec)
   #cnt <- readChar(fileEnc, file.info(fileEnc)$size)
   
   #decryptedString <- Decrypt(cnt, key = key)
   
+  return( decryptedString )
   
+}
+
+
+TestDES <- function(SUNOS = FALSE, HEX_KEY = FALSE, ECB = FALSE, UUENC = FALSE, uuencFile = "", numChars = 100, lines = 10) {
   
-  #check that content is the same
-  expect_equal(fileContent, decryptedString)
+  fileContent <- RandomString(n = lines, length = numChars)
+  #create a temporary file
   
+  res <- DESRounttrip(fileContent)
+  expect_equal(fileContent, res)
   
 }
 
