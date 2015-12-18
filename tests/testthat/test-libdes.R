@@ -19,9 +19,15 @@ test_that("roundtrip long UUENC", {
 
 
 test_that("roundtrip longer UUENC", {
-  
+  #this is failing on Linux
   TestDES(UUENC = TRUE, numChars = 49135, lines = 1)  
   
+})
+
+
+test_that("roundtrip longest UUENC", {
+  #this is failing on Linux
+  TestDES(UUENC = TRUE, numChars = 1000000, lines = 1)  
 })
 
 
