@@ -29,7 +29,7 @@ CFLAG=
 export RCFLAGS=`R CMD config --cppflags`
 
 CC=gcc
-CFLAGS= -m32 -O3 -fomit-frame-pointer $(OPTS) $(CFLAG) 
+CFLAGS= -O3 -fomit-frame-pointer $(OPTS) $(CFLAG) 
 
 CPP=$(CC) -E
 
