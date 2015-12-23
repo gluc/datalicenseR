@@ -1,0 +1,4 @@
+# All changes to datalicenseR are documented here.
+
+## Version 0.2.0
+- FIX: workaround for the large file uuencode problem on some linux systems
