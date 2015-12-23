@@ -4,7 +4,8 @@
 \alias{TryGetBdlData}
 \title{Download the data, if available}
 \usage{
-TryGetBdlData(bdlConnection, responseFileName, parser, verbose = FALSE)
+TryGetBdlData(bdlConnection, responseFileName, parser, verbose = FALSE,
+  useSystemUudecode = FALSE)
 }
 \arguments{
 \item{bdlConnection}{The BdlConnection object used to establish the FTP download}
@@ -14,6 +15,9 @@ TryGetBdlData(bdlConnection, responseFileName, parser, verbose = FALSE)
 \item{parser}{The parser used to convert the file into an R object}
 
 \item{verbose}{Prints progress output if TRUE}
+
+\item{useSystemUudecod}{workaround for a bug with long filenames on some linux systems. Requires installation
+of sharutils on your system (sudo apt-get install sharutils)}
 }
 \value{
 either NULL (if the file is not yet available) or a data.frame containing the data

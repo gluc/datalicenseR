@@ -5,7 +5,7 @@
 \title{Download data from Bloomberg using the gethistory program.}
 \usage{
 GetHistory(con, fields, tickers, fromDate, toDate = Sys.Date(), sync = TRUE,
-  parser = GetHistoryParser, verbose = FALSE)
+  parser = GetHistoryParser, verbose = FALSE, useSystemUudecode = FALSE)
 }
 \arguments{
 \item{con}{The \code{\link{BdlConnection}} object containing the Bloomberg credentials}
@@ -24,6 +24,10 @@ GetHistory(con, fields, tickers, fromDate, toDate = Sys.Date(), sync = TRUE,
 Another parser you might prefer is the \code{\link{GetHistoryListParser}}.}
 
 \item{verbose}{Prints output if TRUE}
+
+\item{useSystemUudecod}{workaround for a bug with long filenames on some linux systems. Requires installation
+of sharutils on your system (sudo apt-get install sharutils). This parameter will be removed as
+soon as we fix the bug.}
 }
 \value{
 A list containing the downloaded data. If you use the default parser, then an xts object
