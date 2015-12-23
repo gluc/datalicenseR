@@ -2,5 +2,6 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 data_gen
-private\*
+private/*
 ^appveyor\.yml$
+src/datalicenseR.a

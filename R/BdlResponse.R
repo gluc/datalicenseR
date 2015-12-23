@@ -53,7 +53,7 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
 #' @param responseFileName The file downloaded
 #' @param parser The parser used to convert the file into an R object
 #' @param verbose Prints progress output if TRUE
-#' @param useSystemUudecod workaround for a bug with long filenames on some linux systems. Requires installation 
+#' @param useSystemUudecode workaround for a bug with long filenames on some linux systems. Requires installation 
 #' of sharutils on your system (sudo apt-get install sharutils)
 #' 
 #' @return either NULL (if the file is not yet available) or a data.frame containing the data

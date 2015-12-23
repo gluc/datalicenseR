@@ -25,7 +25,7 @@ Another parser you might prefer is the \code{\link{GetHistoryListParser}}.}
 
 \item{verbose}{Prints output if TRUE}
 
-\item{useSystemUudecod}{workaround for a bug with long filenames on some linux systems. Requires installation
+\item{useSystemUudecode}{workaround for a bug with long filenames on some linux systems. Requires installation
 of sharutils on your system (sudo apt-get install sharutils). This parameter will be removed as
 soon as we fix the bug.}
 }

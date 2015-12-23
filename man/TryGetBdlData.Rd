@@ -16,7 +16,7 @@ TryGetBdlData(bdlConnection, responseFileName, parser, verbose = FALSE,
 
 \item{verbose}{Prints progress output if TRUE}
 
-\item{useSystemUudecod}{workaround for a bug with long filenames on some linux systems. Requires installation
+\item{useSystemUudecode}{workaround for a bug with long filenames on some linux systems. Requires installation
 of sharutils on your system (sudo apt-get install sharutils)}
 }
 \value{
