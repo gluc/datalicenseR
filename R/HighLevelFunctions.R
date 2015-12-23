@@ -84,6 +84,7 @@ GetData <- function(con,
               PROGRAMNAME = 'getdata', 
               PROGRAMFLAG = 'oneshot', 
               PRICING = 'yes', 
+              SECMASTER = 'yes',
               FUNDAMENTALS = 'yes',
               COMPRESS = 'no')
   
