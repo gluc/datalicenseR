@@ -53,13 +53,15 @@ DeriveResponseFileName <- function(bdlRequest = NULL, requestFileName = NULL, re
 #' @param responseFileName The file downloaded
 #' @param parser The parser used to convert the file into an R object
 #' @param verbose Prints progress output if TRUE
+#' @param useSystemUudecode workaround for a bug with long filenames on some linux systems. Requires installation 
+#' of sharutils on your system (sudo apt-get install sharutils)
 #' 
 #' @return either NULL (if the file is not yet available) or a data.frame containing the data
 #' @import stringr
 #' @seealso UploadRequest
 #' @seealso BdlResponseHandle
 #' @export
-TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FALSE) {
+TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FALSE, useSystemUudecode = FALSE) {
   
   if (!inherits(bdlConnection,"BdlConnection")) stop("bdlConnection must be of class BdlConnection")
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
@@ -70,7 +72,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FAL
   if(ftpDownloadResult$success) {
     if (verbose) cat(paste0("downloaded file of size ", file.info(ftpDownloadResult$destFile)$size, "...\r\n"))
     if (verbose) cat("decrypting file...\r\n")
-    decFile <- DecryptBdlResponse(ftpDownloadResult$destFile, bdlConnection$key, iszip)
+    decFile <- DecryptBdlResponse(ftpDownloadResult$content, bdlConnection$key, iszip, useSystemUudecode)
     if (verbose) cat(paste0("unzipping decrypted file of size ", file.info(decFile)$size, "...\r\n"))
     #decryptedResult <- readChar(decFile, file.info(decFile)$size)
     
@@ -141,13 +143,21 @@ DownloadResponse <- function(bdlConnection, responseFileName, parser, pollFreque
 }
 
 
-DecryptBdlResponse <- function(fileName, key, iszip) {
+DecryptBdlResponse <- function(fileName, key, iszip, useSystemUudecode = FALSE) {
   decFile <- paste0(fileName, '.dec')
   if (iszip) {
     decFile <- paste0(decFile, '.gz')
   }
-  if(file.exists(decFile)) file.remove(decFile) #should not happen, is temp file
-  DecryptFile(fileName, decFile, key, UUENC = TRUE)
+  if (file.exists(decFile)) file.remove(decFile) #should not happen, is temp file
+  if (useSystemUudecode) {
+    decodedName <- paste0(decFile, '.decoded')
+    system(paste("uudecode -o ", decodedName,  fileName))
+    fileName <- decodedName
+    uuenc = FALSE
+  } else {
+    uuenc = TRUE
+  }
+  DecryptFile(fileName, decFile, key, UUENC = uuenc)
   
   return (decFile)
 }

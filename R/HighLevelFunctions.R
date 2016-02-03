@@ -84,6 +84,7 @@ GetData <- function(con,
               PROGRAMNAME = 'getdata', 
               PROGRAMFLAG = 'oneshot', 
               PRICING = 'yes', 
+              SECMASTER = 'yes',
               FUNDAMENTALS = 'yes',
               COMPRESS = 'no')
   
@@ -131,6 +132,9 @@ GetData <- function(con,
 #' @param parser The parser used to convert the file into an R object. The default parser is the \code{\link{GetHistoryParser}}.
 #' Another parser you might prefer is the \code{\link{GetHistoryListParser}}.
 #' @param verbose Prints output if TRUE
+#' @param useSystemUudecode workaround for a bug with long filenames on some linux systems. Requires installation 
+#' of sharutils on your system (sudo apt-get install sharutils). This parameter will be removed as 
+#' soon as we fix the bug.
 #' 
 #' @return A list containing the downloaded data. If you use the default parser, then an xts object
 #' is returned. More precisely, the list contains the following items:
@@ -217,7 +221,8 @@ GetHistory <- function(con,
                        fromDate, toDate = Sys.Date(),  
                        sync = TRUE,
                        parser = GetHistoryParser,
-                       verbose = FALSE) {
+                       verbose = FALSE,
+                       useSystemUudecode = FALSE) {
   res <- list()
   res$connection <- con
   res$success <- TRUE
@@ -240,7 +245,7 @@ GetHistory <- function(con,
   res$replyFileName <- respFileName
 
   callback <- function(parser. = parser, verbose. = verbose) {
-    TryGetBdlData(con, respFileName, parser., verbose = verbose.)
+    TryGetBdlData(con, respFileName, parser., verbose = verbose., useSystemUudecode)
   }
   
   res$GetReply <- callback
