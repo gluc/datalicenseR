@@ -4,6 +4,9 @@
 #' @param user The account number assigned by Bloomberg
 #' @param pw The password of your Bloomberg account
 #' @param key The DES decryption key of your Bloomberg account
+#' @param sftp if TRUE, then an sftp connection is established. On some Linux systems, this may
+#' not work out of the box, as libcurl does not natively support sftp. In that case, you need to 
+#' compile curl with SFTP support. See here for details: http://askubuntu.com/questions/195545/how-to-enable-sftp-support-in-curl
 #' 
 #' @examples
 #' #these are dummy credentials. Replace with the credentials received from Bloomberg 
@@ -15,10 +18,11 @@
 #' @export
 BdlConnection <- function(user, 
                           pw,
-                          key) {
+                          key,
+                          sftp = FALSE) {
  
   
-    sftp <- FALSE #libcurl doesn't support SFTP
+    #sftp <- FALSE #libcurl doesn't support SFTP
     if (sftp) {
       host <- 'dlsftp.bloomberg.com'
       port <- 30206
@@ -207,14 +211,28 @@ DownloadFTP <- function(baseURL, filePath, delete = FALSE) {
   return (res)
 }
 
-
-DownloadFTP_3 <- function(baseURL, filePath, delete = FALSE) {
+DownloadFTP_3 <- function(baseURL, filePath) {
   #with curl
   destFile <- tempfile()
-  url <- paste(baseURL, filePath, sep = '/')
-  h <- new_handle()
-  handle_setopt(h, .list = list(postquote = paste0("DELE ", "/", filePath)))
-  res <- curl_download(url, destFile, mode = "w", handle = h)
+  url <- paste(baseURL, filePath, sep = '/') 
+  
+  result <- tryCatch({
+    res <- curl::curl_download(url, destFile, mode = "w")
+    return ( list(success = TRUE, destFile = destFile))
+  }, 
+    
+  error = function(err) {
+    
+    # error handler picks up where error was generated
+    print(paste("ERROR:  ",err))
+    return ( list(success = FALSE))
+    
+  }) # END tryCatch
+  
+  
+  
+  res <- list( result = res, destFile = destFile)
+  return (res)
 }
 
 
