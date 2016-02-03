@@ -67,8 +67,7 @@ TryGetBdlData <- function(bdlConnection, responseFileName, parser, verbose = FAL
   if (!inherits(responseFileName,"character")) stop("responseFileName must be of class character")
   iszip <- str_sub(responseFileName, start= -3) == '.gz'
   if (verbose) cat(paste0("downloading ftp ", responseFileName, "...\r\n"))
-  ftpDownloadResult <- DownloadFTP_3(bdlConnection$connectionString , responseFileName)
-  browser()
+  ftpDownloadResult <- DownloadFTP(bdlConnection$connectionString , responseFileName)
   if(ftpDownloadResult$success) {
     if (verbose) cat(paste0("downloaded file of size ", file.info(ftpDownloadResult$destFile)$size, "...\r\n"))
     if (verbose) cat("decrypting file...\r\n")
