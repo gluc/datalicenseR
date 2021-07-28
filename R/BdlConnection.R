@@ -24,7 +24,7 @@ BdlConnection <- function(user,
   
     #sftp <- FALSE #libcurl doesn't support SFTP
     if (sftp) {
-      host <- 'dlsftp.bloomberg.com'
+      host <- 'sftp.bloomberg.com'
       port <- 30206
       protocol <- 'sftp'
     } else { 
